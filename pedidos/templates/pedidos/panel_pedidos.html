@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Pedidos</title>
+</head>
+<body>
+    <h1>Panel de Pedidos (HU-03)</h1>
+
+    <h2>Pedidos "En Preparación"</h2>
+
+    <ul>
+        {% for pedido in pedidos %}
+            <li>
+                Pedido #{{ pedido.id }} - Cliente: {{ pedido.cliente }}
+
+                <a href="{% url 'actualizar-estado' pedido.id %}">
+                    <b>[Marcar como Entregado]</b>
+                </a>
+            </li>
+        {% empty %}
+            <li>No hay pedidos en preparación.</li>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>

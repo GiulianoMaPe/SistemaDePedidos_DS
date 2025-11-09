@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Panel de Administración</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f7f7f7; }
+    h1 { text-align: center; color: #333; }
+    table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
+    th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+    th { background: #f0f0f0; }
+    button { background: #007BFF; color: white; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .acciones button { margin-right: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Panel de Administración</h1>
+
+  <button>+ Nuevo Producto</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Precio</th>
+        <th>Stock</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Café Americano</td>
+        <td>Taza 250ml</td>
+        <td>S/. 6.50</td>
+        <td>20</td>
+        <td class="acciones">
+          <button>Editar</button>
+          <button>Eliminar</button>
+        </td>
+      </tr>
+      <tr>
+        <td>Jugo de Naranja</td>
+        <td>Natural 300ml</td>
+        <td>S/. 8.00</td>
+        <td>12</td>
+        <td class="acciones">
+          <button>Editar</button>
+          <button>Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

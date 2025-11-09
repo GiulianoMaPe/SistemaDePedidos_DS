@@ -1,9 +1,12 @@
-# En: pedidos/urls.py
 from django.urls import path
-from . import views  # Importa las vistas de esta misma carpeta (app)
+from . import views
 
 urlpatterns = [
-    # Cuando el usuario visite la raíz de 'pedidos/' (ej: .../pedidos/),
-    # se ejecutará la función 'vista_inicio' que crearemos en el siguiente paso.
-    path('', views.vista_inicio, name='inicio-pedidos'),
+    #HU-01
+    path('registrar/', views.registrar_pedido_vista, name='registrar-pedido'),
+    #HU-02
+    path('personalizar/<int:producto_id>/', views.personalizar_producto_vista, name='personalizar-producto'),
+    #HU-03
+    path('panel/', views.panel_pedidos_vista, name='panel-pedidos'),
+    path('actualizar-estado/<int:pedido_id>/', views.actualizar_estado_vista, name='actualizar-estado'),
 ]

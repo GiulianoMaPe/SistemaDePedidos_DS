@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenido a Coco's Burger</title>
+    <style>
+        body, html {
+            height: 100%; margin: 0; font-family: Arial, sans-serif;
+            background-color: #722f37;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        h1 { font-size: 4em; margin-bottom: 40px; }
+        .botones-container { display: flex; gap: 30px; }
+        .boton-rol {
+            display: block;
+            padding: 20px 40px;
+            font-size: 1.5em;
+            text-decoration: none;
+            color: #722f37;
+            background-color: #FFFFFF;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .boton-rol:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <h1>Bienvenido a Coco's Burger</h1>
+    <div class="botones-container">
+        <a href="{% url 'registrar-pedido' %}" class="boton-rol">Soy Cajero</a>
+
+        <a href="#" class="boton-rol">Soy Administrador</a>
+    </div>
+</body>
+</html>
