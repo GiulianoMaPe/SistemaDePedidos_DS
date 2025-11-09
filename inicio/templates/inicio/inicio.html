@@ -34,9 +34,10 @@
 <body>
     <h1>Bienvenido a Coco's Burger</h1>
     <div class="botones-container">
-        <a href="{% url 'registrar-pedido' %}" class="boton-rol">Soy Cajero</a>
 
-        <a href="#" class="boton-rol">Soy Administrador</a>
+        <a href="{% url 'login-cajero' %}" class="boton-rol">Soy Cajero</a>
+
+        <a href="{% url 'login-admin' %}" class="boton-rol">Soy Administrador</a>
     </div>
 </body>
 </html>

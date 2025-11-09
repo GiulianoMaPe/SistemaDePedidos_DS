@@ -1,31 +1,424 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Coco's Burger</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Pedido - Coco's Burger</title>
     <style>
         body, html {
-            height: 100%;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #722f37; /* Tono de rojo vino */
+            height: 100%; margin: 0; font-family: Arial, sans-serif;
+            background-color: #f0f0f0; overflow: hidden;
         }
-        .container {
-            display: flex;
-            justify-content: center; /* Centrado horizontal */
-            align-items: center;    /* Centrado vertical */
-            height: 100%;
+        .main-container { display: flex; height: 100vh; }
+        .menu-container { width: 65%; display: flex; flex-direction: column; border-right: 1px solid #ccc; }
+        .product-grid {
+            flex-grow: 1; overflow-y: auto; padding: 20px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
         }
-        h1 {
-            font-size: 5em;
-            color: #FFFFFF;
+        .action-bar {
+            flex-shrink: 0; padding: 20px; background-color: #fff;
+            border-top: 1px solid #ccc; box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+        }
+        .ticket-container {
+            width: 35%; display: flex; flex-direction: column;
+            background-color: #ffffff; height: 100%;
+        }
+        .ticket-header {
+            padding: 20px; background-color: #722f37;
+            color: white; text-align: center;
+        }
+        .ticket-items { flex-grow: 1; overflow-y: auto; padding: 15px; position: relative; }
+        .ticket-total {
+            flex-shrink: 0; padding: 20px; border-top: 2px dashed #ccc;
+            font-size: 1.5em; font-weight: bold;
+            display: flex; justify-content: space-between;
+        }
+        .ticket-items ul { list-style: none; padding: 0; margin: 0; }
+        #empty-cart-message {
+            text-align: center; color: #888; margin-top: 30px; display: block;
+        }
+        /* Estilos de Ticket */
+        .ticket-item {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 10px 0; border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+        .item-main-row {
+            display: flex; justify-content: space-between; width: 100%; align-items: center;
+        }
+        .item-info-name {
+            display: flex; align-items: center; gap: 5px; cursor: pointer;
+            font-weight: bold;
+        }
+        .ticket-item-controls {
+            display: flex; align-items: center; gap: 5px; white-space: nowrap;
+        }
+        .remove-btn, .ticket-item-controls button {
+            background-color: #722f37; color: white; border: none; border-radius: 4px;
+            width: 24px; height: 24px; cursor: pointer; line-height: 1;
+        }
+        .remove-btn { background-color: #dc3545; }
+
+        /* Estilos para el Dropdown de Personalización */
+        .item-customization-area {
+            width: 100%; padding: 10px 0 0 15px;
+            font-size: 0.9em;
+            display: none;
+        }
+        .item-customization-area.open {
+            display: block;
+        }
+        .ingredient-list { list-style: none; padding: 0; margin: 5px 0 10px 0; }
+        .ingredient-item {
+            cursor: pointer; padding: 3px 0;
+            display: flex; justify-content: space-between;
+        }
+        .ingredient-item:hover { background-color: #f7f7f7; }
+        .ingredient-item.removed .ing-name {
+            text-decoration: line-through;
+            color: #aaa;
+        }
+        .ingredient-item.extra .ing-name {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .add-extra-btn {
+            background-color: #28a745; color: white; border: none;
+            padding: 5px 10px; border-radius: 4px; cursor: pointer;
+            margin-top: 5px;
+        }
+        /* Estilos del Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); display: none;
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background-color: white; padding: 20px; border-radius: 10px;
+            width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;
+        }
+        .modal-close {
+            background: none; border: none; font-size: 1.5em; cursor: pointer;
+            color: #aaa;
+        }
+        .extra-option {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px; border-bottom: 1px solid #f5f5f5; cursor: pointer;
+            border-radius: 4px;
+        }
+        .extra-option:hover { background-color: #f9f9f9; }
+        .extra-option.selected {
+            background-color: #e6f7ff;
+            border: 1px solid #007bff;
+        }
+        .extra-info { font-weight: bold; }
+        .extra-price { color: #28a745; font-size: 0.9em; }
+        .modal-footer {
+            margin-top: 20px; text-align: right;
+        }
+        .save-btn {
+            padding: 10px 20px; background-color: #28a745; color: white;
+            border: none; border-radius: 5px; cursor: pointer;
+            font-size: 1em;
         }
     </style>
-    </head>
+</head>
 <body>
-    <div class="container">
-        <h1>Coco's Burger</h1>
+
+<div class="main-container">
+
+    <div class="menu-container">
+        <div class="product-grid">
+            <button class="product-card" onclick="agregarAlPedido(1,'Hamburguesa Clásica',12.50, ['Lechuga', 'Tomate', 'Cebolla', 'Salsa Clásica'])">
+                <img src="https://via.placeholder.com/150x90?text=Clásica" alt="Hamburguesa Clásica">
+                <div class="product-name">Hamburguesa Clásica</div>
+                <div class="product-price">S/ 12.50</div>
+            </button>
+            <button class="product-card" onclick="agregarAlPedido(2,'Hamburguesa BBQ',14.00, ['Lechuga', 'Cebolla Crujiente', 'Tocino', 'Salsa BBQ'])">
+                <img src="https://via.placeholder.com/150x90?text=BBQ" alt="Hamburguesa BBQ">
+                <div class="product-name">Hamburguesa BBQ</div>
+                <div class="product-price">S/ 14.00</div>
+            </button>
+            <button class="product-card" onclick="agregarAlPedido(3,'Hamburguesa Doble',18.50, ['Doble Carne', 'Doble Queso', 'Pepinillos', 'Salsa Especial'])">
+                <img src="https://via.placeholder.com/150x90?text=Doble" alt="Hamburguesa Doble">
+                <div class="product-name">Hamburguesa Doble</div>
+                <div class="product-price">S/ 18.50</div>
+            </button>
+        </div>
+
+        <div class="action-bar">
+            <form method="POST" action="">
+                {% csrf_token %}
+                <input type="hidden" name="pedido_data" id="pedido_data_input">
+                <button type="submit" class="confirm-button">Confirmar Compra</button>
+            </form>
+        </div>
     </div>
+
+    <div class="ticket-container">
+        <div class="ticket-header"><h3>Mi Pedido</h3></div>
+
+        <div class="ticket-items">
+            <p id="empty-cart-message">Tu pedido está vacío</p>
+            <ul id="order-items-list"></ul>
+        </div>
+
+        <div class="ticket-total">
+            <span>Total:</span>
+            <span id="order-total">S/ 0.00</span>
+        </div>
+    </div>
+</div>
+
+<div id="extras-modal" class="modal-overlay" onclick="if(event.target.id === 'extras-modal') cerrarModalExtras()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h4 id="modal-product-name">Añadir Extras Adicionales</h4>
+            <button class="modal-close" onclick="cerrarModalExtras()">&times;</button>
+        </div>
+
+        <div id="extras-list-container">
+            </div>
+
+        <div class="modal-footer">
+            <button class="save-btn" onclick="guardarExtrasModal()">Añadir Extras</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let pedido = {};
+    let itemIdCounter = 1;
+    let currentEditingItemId = null;
+
+    // Ingredientes extra para añadir (Afectan el precio) - ¡Nuevas opciones añadidas!
+    const ingredientesExtra = [
+        { id: 101, nombre: 'Queso Cheddar Extra', precio: 2.00 },
+        { id: 102, nombre: 'Tocino Ahumado', precio: 3.50 },
+        { id: 103, nombre: 'Pepinillos Extra', precio: 1.00 },
+        { id: 104, nombre: 'Huevo Frito', precio: 1.50 },
+        { id: 105, nombre: 'Aguacate (Palta)', precio: 4.00 }, // ¡NUEVO!
+        { id: 106, nombre: 'Champiñones Salteados', precio: 2.50 } // ¡NUEVO!
+    ];
+
+    function agregarAlPedido(pId, nombre, precio, ingredientesBase) {
+        const idUnico = itemIdCounter++;
+        document.getElementById('empty-cart-message').style.display = 'none';
+
+        pedido[idUnico] = {
+            pId: pId,
+            nombre: nombre,
+            precioBase: parseFloat(precio),
+            cantidad: 1,
+            ingredientesBase: ingredientesBase.map(ing => ({ nombre: ing, removed: false })),
+            extras: []
+        };
+
+        actualizarTicket();
+    }
+
+    // Función arreglada para cambiar la cantidad y forzar actualización
+    function cambiarCantidad(itemId, delta) {
+        if (!pedido[itemId]) return;
+
+        // Aseguramos que itemId se use como string (clave del objeto)
+        const item = pedido[itemId];
+
+        item.cantidad += delta;
+        if (item.cantidad <= 0) eliminarItem(itemId);
+        else actualizarTicket();
+    }
+
+    function eliminarItem(itemId) {
+        delete pedido[itemId];
+        actualizarTicket();
+    }
+
+    // Función para desplegar/ocultar la lista de ingredientes
+    function toggleCustomization(itemId) {
+        const area = document.getElementById(`custom-area-${itemId}`);
+        const arrow = document.querySelector(`#custom-area-${itemId} + .item-main-row .dropdown-arrow`);
+
+        area.classList.toggle('open');
+        // Opcional: Rotar la flecha
+        // if (area.classList.contains('open')) {
+        //     arrow.style.transform = 'rotate(180deg)';
+        // } else {
+        //     arrow.style.transform = 'rotate(0deg)';
+        // }
+    }
+
+    // Función para quitar/re-agregar un ingrediente base (NO afecta el precio)
+    function toggleBaseIngredient(itemId, ingName, element) {
+        const item = pedido[itemId];
+        if (!item) return;
+
+        const ingredient = item.ingredientesBase.find(ing => ing.nombre === ingName);
+
+        if (ingredient) {
+            ingredient.removed = !ingredient.removed;
+            element.classList.toggle('removed', ingredient.removed);
+        }
+        // No se llama a actualizarTicket, el precio no cambia.
+    }
+
+    // Lógica de Cálculo (Esta es la que suma los extras)
+    function calcularPrecioItem(item) {
+        let precioUnitario = item.precioBase;
+        if (item.extras && item.extras.length > 0) {
+            const precioExtras = item.extras.reduce((acc, extra) => acc + extra.precio, 0);
+            precioUnitario += precioExtras;
+        }
+        return precioUnitario * item.cantidad;
+    }
+
+    function actualizarTicket() {
+        const itemList = document.getElementById('order-items-list');
+        const totalElement = document.getElementById('order-total');
+        const pedidoDataInput = document.getElementById('pedido_data_input');
+        const emptyMessage = document.getElementById('empty-cart-message');
+
+        itemList.innerHTML = '';
+        let total = 0;
+        const itemIds = Object.keys(pedido);
+
+        if (itemIds.length === 0) {
+            emptyMessage.style.display = 'block';
+            totalElement.textContent = 'S/ 0.00';
+            pedidoDataInput.value = '';
+            return;
+        } else {
+            emptyMessage.style.display = 'none';
+        }
+
+        for (const itemId of itemIds) {
+            const item = pedido[itemId];
+            const subtotal = calcularPrecioItem(item);
+            total += subtotal;
+
+            const li = document.createElement('li');
+            li.className = 'ticket-item';
+
+            let customizationHtml = '<ul class="ingredient-list">';
+
+            // 1. Ingredientes Base (se pueden quitar)
+            item.ingredientesBase.forEach(ing => {
+                const removedClass = ing.removed ? 'removed' : '';
+                customizationHtml += `
+                    <li class="ingredient-item ${removedClass}" onclick="toggleBaseIngredient('${itemId}', '${ing.nombre}', this)">
+                        <span class="ing-name">${ing.nombre} (Base)</span>
+                        <span class="ing-status">${ing.removed ? 'QUITADO' : 'INCLUIDO'}</span>
+                    </li>`;
+            });
+
+            // 2. Ingredientes Extra (se pueden añadir/quitar desde el modal)
+            item.extras.forEach(extra => {
+                customizationHtml += `
+                    <li class="ingredient-item extra">
+                        <span class="ing-name">+ ${extra.nombre}</span>
+                        <span class="ing-price">S/ ${extra.precio.toFixed(2)}</span>
+                    </li>`;
+            });
+
+            customizationHtml += '</ul>';
+
+            customizationHtml += `<button class="add-extra-btn" onclick="mostrarModalExtras('${itemId}')">Añadir/Quitar Extras</button>`;
+
+            li.innerHTML = `
+                <div class="item-main-row">
+                    <div class="item-info-name" onclick="toggleCustomization('${itemId}')">
+                        <span style="font-size: 1.2em;">${item.nombre}</span>
+                        <span class="dropdown-arrow" style="font-size: 0.8em; transition: transform 0.2s;">&#9660;</span>
+                    </div>
+                    <div class="ticket-item-controls">
+                        <button onclick="cambiarCantidad('${itemId}', -1)">-</button>
+                        <span>${item.cantidad}</span>
+                        <button onclick="cambiarCantidad('${itemId}', 1)">+</button>
+                        <span class="ticket-item-price" style="font-weight: bold;">S/ ${subtotal.toFixed(2)}</span>
+                        <button class="remove-btn" onclick="eliminarItem('${itemId}')">X</button>
+                    </div>
+                </div>
+                <div class="item-customization-area" id="custom-area-${itemId}">
+                    <h4>Personalización:</h4>
+                    ${customizationHtml}
+                </div>`;
+            itemList.appendChild(li);
+        }
+
+        totalElement.textContent = `S/ ${total.toFixed(2)}`;
+        pedidoDataInput.value = JSON.stringify(pedido);
+    }
+
+    // ===================================
+    // LÓGICA DEL MODAL DE EXTRAS ADICIONALES
+    // ===================================
+
+    function mostrarModalExtras(itemId) {
+        currentEditingItemId = itemId;
+        const item = pedido[itemId];
+
+        document.getElementById('modal-product-name').textContent = `Extras para: ${item.nombre}`;
+        const extrasContainer = document.getElementById('extras-list-container');
+        extrasContainer.innerHTML = '';
+
+        ingredientesExtra.forEach(extra => {
+            const isSelected = item.extras.some(e => e.id === extra.id);
+
+            const optionDiv = document.createElement('div');
+            optionDiv.className = `extra-option ${isSelected ? 'selected' : ''}`;
+            optionDiv.setAttribute('data-extra-id', extra.id);
+            // Usamos una función anónima para pasar 'this' y el id
+            optionDiv.setAttribute('onclick', `toggleExtraModal(this, ${extra.id})`);
+
+            optionDiv.innerHTML = `
+                <span class="extra-info">${extra.nombre}</span>
+                <span class="extra-price">+ S/ ${extra.precio.toFixed(2)}</span>
+            `;
+            extrasContainer.appendChild(optionDiv);
+        });
+
+        document.getElementById('extras-modal').style.display = 'flex';
+    }
+
+    function cerrarModalExtras() {
+        document.getElementById('extras-modal').style.display = 'none';
+        currentEditingItemId = null;
+    }
+
+    function toggleExtraModal(element) {
+        element.classList.toggle('selected');
+    }
+
+    function guardarExtrasModal() {
+        if (!currentEditingItemId) {
+            cerrarModalExtras();
+            return;
+        }
+
+        const item = pedido[currentEditingItemId];
+        item.extras = []; // Reiniciar los extras
+
+        const selectedElements = document.querySelectorAll('#extras-list-container .extra-option.selected');
+
+        selectedElements.forEach(el => {
+            const extraId = parseInt(el.getAttribute('data-extra-id'));
+            const extraData = ingredientesExtra.find(e => e.id === extraId);
+
+            if (extraData) {
+                item.extras.push(extraData);
+            }
+        });
+
+        actualizarTicket();
+        cerrarModalExtras();
+    }
+</script>
 </body>
 </html>
