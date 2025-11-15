@@ -1,0 +1,8 @@
+CREATE DATABASE DBCocosB;
+
+CREATE LOGIN django_user WITH PASSWORD = '123456';
+
+USE DBCocosB;
+CREATE USER django_user FOR LOGIN django_user;
+
+ALTER ROLE db_owner ADD MEMBER django_user;
