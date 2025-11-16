@@ -1,16 +1,73 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from productos.models import Producto
-from .models import Pedido
+from django.contrib import messages
+from .models import Pedido, DetallePedido
+import json
 
-#HU-01: Registrar nuevo pedido
+
+# HU-01: Registrar nuevo pedido
 def registrar_pedido_vista(request):
+    if request.method == 'POST':
+        pedido_data = request.POST.get('pedido_data')
+
+        if pedido_data:
+            try:
+                # Parsear el JSON del pedido
+                pedido_json = json.loads(pedido_data)
+
+                # Solicitar nombre del cliente (puedes cambiarlo por un campo en el form)
+                cliente = request.POST.get('cliente', 'Cliente General')
+
+                # Calcular el total
+                total = 0
+                for item_id, item in pedido_json.items():
+                    precio_base = float(item['precioBase'])
+                    cantidad = int(item['cantidad'])
+
+                    # Sumar extras
+                    precio_extras = sum(float(extra['precio']) for extra in item.get('extras', []))
+
+                    subtotal = (precio_base + precio_extras) * cantidad
+                    total += subtotal
+
+                # Crear el pedido
+                pedido = Pedido.objects.create(
+                    cliente=cliente,
+                    total=total,
+                    estado='En preparación'
+                )
+
+                # Crear los detalles del pedido
+                for item_id, item in pedido_json.items():
+                    producto_id = item['pId']
+                    cantidad = item['cantidad']
+
+                    try:
+                        producto = Producto.objects.get(id=producto_id)
+                        DetallePedido.objects.create(
+                            pedido=pedido,
+                            producto=producto,
+                            cantidad=cantidad
+                        )
+                    except Producto.DoesNotExist:
+                        pass
+
+                messages.success(request, f'Pedido #{pedido.id} registrado exitosamente!')
+                return redirect('panel-pedidos')
+
+            except Exception as e:
+                messages.error(request, f'Error al procesar el pedido: {str(e)}')
+        else:
+            messages.warning(request, 'El carrito está vacío')
+
     productos = Producto.objects.all()
     contexto = {
         'productos': productos
     }
     return render(request, 'pedidos/registrar_pedido.html', contexto)
 
-#HU-02: Personalizar producto
+
+# HU-02: Personalizar producto
 def personalizar_producto_vista(request, producto_id):
     producto = Producto.objects.get(id=producto_id)
     contexto = {
@@ -18,9 +75,11 @@ def personalizar_producto_vista(request, producto_id):
     }
     return render(request, 'pedidos/personalizar_producto.html', contexto)
 
-#HU-03: Actualizar estado de un pedido
+
+# HU-03: Actualizar estado de un pedido
 def panel_pedidos_vista(request):
-    pedidos_activos = Pedido.objects.filter(estado='En preparación')
+    # Mostrar todos los pedidos excepto los entregados y cancelados
+    pedidos_activos = Pedido.objects.exclude(estado__in=['Entregado', 'Cancelado']).order_by('-fecha')
 
     contexto = {
         'pedidos': pedidos_activos
@@ -28,11 +87,17 @@ def panel_pedidos_vista(request):
 
     return render(request, 'pedidos/panel_pedidos.html', contexto)
 
+
 def actualizar_estado_vista(request, pedido_id):
     pedido = get_object_or_404(Pedido, id=pedido_id)
 
-    #Actualizamos el estado
-    pedido.estado = 'Entregado'
-    pedido.save()
+    if request.method == 'POST':
+        nuevo_estado = request.POST.get('estado')
+
+        # Validar que el estado sea válido
+        estados_validos = ['En preparación', 'Listo para entregar', 'Entregado', 'Cancelado']
+        if nuevo_estado in estados_validos:
+            pedido.estado = nuevo_estado
+            pedido.save()
 
     return redirect('panel-pedidos')
