@@ -1,62 +1,523 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Login Cajero</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Caja - Cocos Burger</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body, html {
-            height: 100%; margin: 0; font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
+            height: 100vh;
+            width: 100vw;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
+
+        .workspace {
+            height: 100vh;
+            width: 100vw;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: linear-gradient(135deg, #1a0505 0%, #2d0a0a 100%);
+        }
+
+        /* Panel izquierdo */
+        .left-panel {
             display: flex;
+            flex-direction: column;
             justify-content: center;
+            padding: 4vh 5vw;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(185, 28, 28, 0.08) 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(220, 38, 38, 0.04) 2px, transparent 2px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .brand-section {
+            position: relative;
+            z-index: 1;
+        }
+
+        .company-logo {
+            display: flex;
             align-items: center;
+            justify-content: center;
+            margin-bottom: 3vh;
         }
-        .login-box {
-            background-color: white;
-            color: #333;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            width: 300px;
+
+        .logo-icon {
+            width: 8vw;
+            height: 8vw;
+            min-width: 100px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
-        h2 { text-align: center; color: #722f37; }
-        div { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="password"] {
+
+        .logo-icon img {
             width: 100%;
-            padding: 8px;
-            box-sizing: border-box; /* Para que el padding no afecte el ancho */
+            height: 100%;
+            object-fit: contain;
         }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #722f37;
-            color: white;
+
+        .shift-info {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 2vh 1.5vw;
+            margin-bottom: 3vh;
+            backdrop-filter: blur(10px);
+        }
+
+        .shift-title {
+            color: #dc2626;
+            font-size: clamp(11px, 0.8vw, 14px);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1.5vh;
+        }
+
+        .shift-detail {
+            display: flex;
+            align-items: center;
+            gap: 1vw;
+            padding: 1vh 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.85);
+            font-size: clamp(12px, 0.9vw, 16px);
+        }
+
+        .shift-detail:last-child {
+            border-bottom: none;
+        }
+
+        .shift-icon {
+            font-size: clamp(18px, 1.3vw, 24px);
+            width: 2vw;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.1), rgba(34, 197, 94, 0.05));
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            border-radius: 12px;
+            padding: 2vh 1.5vw;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .instructions-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5vw;
+            font-weight: 700;
+            font-size: clamp(12px, 0.85vw, 15px);
+            margin-bottom: 1.5vh;
+            color: #4ade80;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .instructions li {
+            padding: 0.8vh 0;
+            padding-left: 1.5vw;
+            position: relative;
+            font-size: clamp(11px, 0.8vw, 14px);
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .instructions li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #4ade80;
             font-weight: bold;
+        }
+
+        /* Panel derecho */
+        .right-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4vh 5vw;
+            background: #0a0a0a;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .login-header {
+            margin-bottom: 3vh;
+        }
+
+        .session-title {
+            color: white;
+            font-size: clamp(26px, 2vw, 36px);
+            font-weight: 800;
+            margin-bottom: 1vh;
+        }
+
+        .session-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: clamp(13px, 0.9vw, 16px);
+            line-height: 1.6;
+        }
+
+        .employee-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6vw;
+            background: rgba(220, 38, 38, 0.15);
+            border: 1.5px solid rgba(220, 38, 38, 0.4);
+            padding: 1vh 1.5vw;
+            border-radius: 10px;
+            margin: 2vh 0 3vh;
+            font-weight: 600;
+            color: #dc2626;
+            font-size: clamp(11px, 0.8vw, 14px);
+            letter-spacing: 0.5px;
+        }
+
+        .live-indicator {
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #4ade80;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        .form-field {
+            margin-bottom: 2.5vh;
+        }
+
+        .field-label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: clamp(12px, 0.8vw, 14px);
+            font-weight: 600;
+            margin-bottom: 1vh;
+            letter-spacing: 0.3px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 1.2vw;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: clamp(18px, 1.2vw, 22px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            height: clamp(50px, 5.5vh, 60px);
+            padding: 0 1.2vw 0 3.5vw;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: clamp(14px, 0.9vw, 16px);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]::placeholder,
+        input[type="password"]::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #dc2626;
+            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15);
+        }
+
+        .input-group input:focus ~ .field-icon {
+            color: #dc2626;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .btn-clock-in {
+            width: 100%;
+            height: clamp(55px, 6vh, 65px);
+            margin-top: 2vh;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
             border: none;
-            border-radius: 5px;
+            border-radius: 12px;
+            color: white;
+            font-size: clamp(14px, 1vw, 17px);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 35px rgba(220, 38, 38, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-clock-in::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-clock-in:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 45px rgba(220, 38, 38, 0.5);
+        }
+
+        .btn-clock-in:hover::before {
+            left: 100%;
+        }
+
+        .btn-clock-in:active {
+            transform: translateY(0);
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1vw;
+            margin-top: 3vh;
+            padding-top: 3vh;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5vh 1vw;
+            text-align: center;
+        }
+
+        .stat-value {
+            color: #dc2626;
+            font-size: clamp(20px, 1.6vw, 28px);
+            font-weight: 800;
+            margin-bottom: 0.5vh;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: clamp(10px, 0.7vw, 12px);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .system-info {
+            margin-top: 2vh;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: clamp(10px, 0.7vw, 12px);
+        }
+
+        /* Responsive para pantallas pequeñas */
+        @media (max-width: 1024px) {
+            .workspace {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+
+            .left-panel {
+                padding: 3vh 4vw;
+            }
+
+            .company-logo {
+                margin-bottom: 2vh;
+            }
+
+            .shift-info,
+            .instructions {
+                padding: 1.5vh 3vw;
+                margin-bottom: 2vh;
+            }
+
+            .right-panel {
+                padding: 3vh 4vw;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h2>Inicio de Sesión (HU-06)</h2>
+    <div class="workspace">
+        <div class="left-panel">
+            <div class="brand-section">
+                <div class="company-logo">
+                    <div class="logo-icon">
+                        <img src="{% static 'Images/logococos.png' %}" alt="Logo">
+                    </div>
+                </div>
 
-        <!-- Este formulario enviará un 'POST' a la misma URL -->
-        <form method="post">
-            {% csrf_token %} <!-- Requerido por Django -->
-            <div>
-                <label for="usuario">Usuario:</label>
-                <input type="text" id="usuario" name="usuario">
+                <div class="shift-info">
+                    <div class="shift-title">Información del Turno</div>
+                    <div class="shift-detail">
+                        <span class="shift-icon">📅</span>
+                        <span id="current-date">Domingo, 16 de Noviembre 2025</span>
+                    </div>
+                    <div class="shift-detail">
+                        <span class="shift-icon">⏰</span>
+                        <span id="current-time">09:00 AM</span>
+                    </div>
+                    <div class="shift-detail">
+                        <span class="shift-icon">🏪</span>
+                        <span>Sucursal Principal</span>
+                    </div>
+                    <div class="shift-detail">
+                        <span class="shift-icon">💼</span>
+                        <span>Turno Mañana</span>
+                    </div>
+                </div>
+
+                <div class="instructions">
+                    <div class="instructions-title">
+                        <span>💡</span>
+                        <span>Antes de Iniciar</span>
+                    </div>
+                    <ul>
+                        <li>Verifica que la caja registradora esté lista</li>
+                        <li>Confirma el fondo de efectivo inicial</li>
+                        <li>Mantén tu área de trabajo organizada</li>
+                    </ul>
+                </div>
             </div>
-            <div>
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" name="password">
+        </div>
+
+        <div class="right-panel">
+            <div class="login-container">
+                <div class="login-header">
+                    <h1 class="session-title">INICIAR SESIÓN</h1>
+                    <p class="session-subtitle">
+                        Ingresa tus credenciales de empleado para comenzar tu turno de trabajo
+                    </p>
+                    <div class="employee-badge">
+                        <span class="live-indicator"></span>
+                        <span>SISTEMA ACTIVO - ACCESO CAJERO</span>
+                    </div>
+                </div>
+
+                <form method="post">
+                    <div class="form-field">
+                        <label class="field-label" for="usuario">Usuario de Empleado</label>
+                        <div class="input-group">
+                            <input
+                                type="text"
+                                id="usuario"
+                                name="usuario"
+                                placeholder="Ej: juan.perez"
+                                required
+                                autocomplete="username"
+                                autofocus
+                            >
+                            <span class="field-icon">👤</span>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="field-label" for="password">Contraseña</label>
+                        <div class="input-group">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Ingresa tu contraseña"
+                                required
+                                autocomplete="current-password"
+                            >
+                            <span class="field-icon">🔐</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-clock-in">
+                         Iniciar Turno de Trabajo
+                    </button>
+                </form>
+
+                <div class="quick-stats">
+                    <div class="stat-box">
+                        <div class="stat-value">Fast</div>
+                        <div class="stat-label">Sistema Ágil</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">24/7</div>
+                        <div class="stat-label">Soporte</div>
+                    </div>
+                </div>
+
+                <div class="system-info">
+                    Sistema POS Cocos Burger v2.0 © 2024
+                </div>
             </div>
-            <!-- Este botón activa el 'POST' -->
-            <button type="submit">Ingresar</button>
-        </form>
+        </div>
     </div>
+
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const dateEl = document.getElementById('current-date');
+            const timeEl = document.getElementById('current-time');
+
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateEl.textContent = now.toLocaleDateString('es-ES', options);
+
+            timeEl.textContent = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script>
 </body>
 </html>
