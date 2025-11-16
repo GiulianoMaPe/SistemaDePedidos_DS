@@ -450,6 +450,7 @@
                 </div>
 
                 <form method="post">
+                    {% csrf_token %}
                     <div class="form-field">
                         <label class="field-label" for="usuario">Usuario de Empleado</label>
                         <div class="input-group">
