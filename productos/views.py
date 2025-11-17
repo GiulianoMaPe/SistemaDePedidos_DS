@@ -13,26 +13,31 @@ def administrar_productos_vista(request):
     }
     return render(request, 'productos/admin_productos.html', contexto)
 
+
 def agregar_producto_vista(request):
     if request.method == 'POST':
         try:
             nombre = request.POST.get('nombre')
-            precio = request.POST.get('precio')
+            precio_input = request.POST.get('precio')  # Obtener como string
             categoria = request.POST.get('categoria')
             descripcion = request.POST.get('descripcion')
 
-            # 1. Crear producto
+            try:
+                precio = float(precio_input)
+                if precio < 0:
+                    precio = 0.0
+            except ValueError:
+                precio = 0.0
+
             nuevo_producto = Producto.objects.create(
                 nombre=nombre,
                 precio=precio,
                 categoria=categoria,
                 descripcion=descripcion
             )
-
-            # 2. Asociar insumos (Solución al error que tenías)
+            # Asociar insumos seleccionados
             insumos_ids = request.POST.getlist('insumos_ids')
             if insumos_ids:
-                # Convertimos a enteros para asegurar
                 insumos_ids = [int(id) for id in insumos_ids]
                 nuevo_producto.insumos.set(insumos_ids)
 
@@ -52,10 +57,10 @@ def eliminar_producto_vista(request, producto_id):
 
 def agregar_insumo_vista(request):
     if request.method == 'POST':
-        nombre = request.POST.get('nombre').strip() # Quitamos espacios extra
+        nombre = request.POST.get('nombre').strip()
         stock = request.POST.get('stock', 0)
 
-        # Validación 1: Verificar duplicados (Mayúsculas/Minúsculas)
+        # Verificar duplicados
         if Insumo.objects.filter(nombre__iexact=nombre).exists():
             messages.error(request, f'¡El insumo "{nombre}" ya existe!')
             return redirect('admin-productos')

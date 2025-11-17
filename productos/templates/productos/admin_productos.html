@@ -5,57 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administrar Menú e Insumos</title>
     <style>
-        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; background-color: #f1f5f9; }
+        body, html {
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5; /* Igual a admin_personal */
+        }
 
         /* Alertas */
         .alert-container { padding: 20px 20px 0; max-width: 1200px; margin: 0 auto; }
         .alert { padding: 15px; border-radius: 6px; margin-bottom: 10px; color: white; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .alert-success { background-color: #10b981; } /* Verde */
-        .alert-error { background-color: #ef4444; } /* Rojo */
-        .alert-warning { background-color: #f59e0b; } /* Naranja */
+        .alert-success { background-color: #d4edda; color: #155724; } /* Estilo success de admin_personal */
+        .alert-error { background-color: #f8d7da; color: #721c24; } /* Estilo error de admin_personal */
+        .alert-warning { background-color: #fff3cd; color: #856404; }
 
         /* Cabecera */
-        .nav-header { background-color: #1e293b; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .btn-nav { background-color: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-size: 0.9em; transition: 0.2s; }
-        .btn-nav:hover { background-color: rgba(255,255,255,0.2); }
+        .nav-header {
+            background-color: #1e293b;
+            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+            color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .nav-header h2 { margin: 0; font-size: 1.5em; }
+
+        .btn-nav {
+            background-color: rgba(255,255,255,0.2); color: white; text-decoration: none;
+            padding: 8px 15px; border-radius: 5px; font-size: 0.9em; transition: background 0.3s;
+            margin-left: 10px;
+        }
+        .btn-nav:hover { background-color: rgba(255,255,255,0.3); }
 
         /* Contenedor */
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
-        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
-        .section-header h3 { margin: 0; color: #0f172a; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
 
-        /* Botones */
-        .btn-primary { background-color: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .btn-primary:hover { background-color: #1d4ed8; }
-        .btn-secondary { background-color: #64748b; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        .card {
+            background: white; border-radius: 8px; padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Sombra ajustada a admin_personal */
+        }
 
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .section-header h3 { margin: 0; color: #333; }
+
+        /* Botones de Acción Principal (Agregar) - Estilo admin_personal */
+        .btn-add {
+            background-color: #28a745; /* Verde */
+            color: white; border: none;
+            padding: 10px 16px; border-radius: 5px; cursor: pointer;
+            font-size: 0.95em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .btn-add:hover { background-color: #218838; transform: scale(1.02); }
+
+        /* Botones pequeños de tabla */
         .btn-icon { background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 5px; border-radius: 4px; }
-        .btn-edit { color: #3b82f6; }
-        .btn-edit:hover { background-color: #eff6ff; }
-        .btn-delete { color: #ef4444; }
-        .btn-delete:hover { background-color: #fef2f2; }
+        .btn-edit { color: #007bff; } /* Azul Bootstrap */
+        .btn-edit:hover { background-color: #e2e6ea; }
+        .btn-delete { color: #dc3545; } /* Rojo Bootstrap */
+        .btn-delete:hover { background-color: #f8d7da; }
 
-        /* Tablas */
+        /* Tablas - Estilo admin_personal */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.95em; }
-        th { color: #64748b; font-weight: 600; background-color: #f8fafc; }
-        .tag-insumo { background-color: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; margin-right: 4px; display: inline-block; margin-bottom: 2px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.95em; }
+        th { background-color: #eee; color: #555; font-weight: bold; }
+        tr:hover { background-color: #f9f9f9; }
+
+        .tag-insumo { background-color: #e2e6ea; color: #555; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; margin-right: 4px; display: inline-block; margin-bottom: 2px; border: 1px solid #ddd;}
 
         /* Modales */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px); }
-        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        /* Formulario */
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #334155; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
-        .insumos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; max-height: 150px; overflow-y: auto; }
-        .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 0.9em; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+
+        /* Botón Submit del Modal - Estilo admin_personal */
+        .btn-submit {
+            width: 100%; padding: 12px; background-color: #334155; /* Azul Oscuro */
+            color: white; border: none; border-radius: 5px;
+            font-size: 1.1em; cursor: pointer; font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn-submit:hover { background-color: #1e293b; }
+
+        /* Grid de Insumos */
+        .insumos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; max-height: 250px; overflow-y: auto; }
+        .checkbox-item { display: flex; align-items: center; justify-content: flex-start; background-color: white; border: 1px solid #cbd5e1; padding: 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; font-size: 0.95em; color: #334155; user-select: none;width: 100%; box-sizing: border-box; }
+        .checkbox-item:hover { background-color: #eff6ff; border-color: #3b82f6; }
+        .checkbox-item input[type="checkbox"] { margin-right: 12px; width: 18px; height: 18px; accent-color: #2563eb; cursor: pointer; flex-shrink: 0; }
+
+        .empty-state { text-align: center; padding: 30px; color: #888; }
     </style>
 </head>
 <body>
 
     <div class="nav-header">
-        <h2>🍔 Administración de Menú </h2>
+        <h2>🍔 Administración de Menú</h2>
         <div>
             <a href="{% url 'panel-pedidos' %}" class="btn-nav">📋 Pedidos</a>
             <a href="{% url 'admin-personal' %}" class="btn-nav">👤 Personal</a>
@@ -78,7 +121,7 @@
         <div class="card">
             <div class="section-header">
                 <h3>Productos del Menú</h3>
-                <button class="btn-primary" onclick="abrirModal('modalProducto')">+ Nuevo Producto</button>
+                <button class="btn-add" onclick="abrirModal('modalProducto')">+ Nuevo Producto</button>
             </div>
             <table>
                 <thead>
@@ -94,14 +137,14 @@
                     <tr>
                         <td>
                             <strong>{{ producto.nombre }}</strong><br>
-                            <small style="color:#64748b">{{ producto.categoria }}</small>
+                            <small style="color:#666">{{ producto.categoria }}</small>
                         </td>
-                        <td>S/ {{ producto.precio }}</td>
+                        <td style="font-weight: bold; color: #28a745;">S/ {{ producto.precio }}</td>
                         <td>
                             {% for insumo in producto.insumos.all %}
                                 <span class="tag-insumo">{{ insumo.nombre }}</span>
                             {% empty %}
-                                <span style="color:#94a3b8; font-size:0.8em;">-</span>
+                                <span style="color:#999; font-size:0.8em;">-</span>
                             {% endfor %}
                         </td>
                         <td style="text-align: right;">
@@ -109,7 +152,7 @@
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="4" style="text-align:center; padding: 20px; color:#94a3b8;">No hay productos registrados.</td></tr>
+                    <tr><td colspan="4" class="empty-state">No hay productos registrados.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -118,7 +161,7 @@
         <div class="card">
             <div class="section-header">
                 <h3>Almacén de Insumos</h3>
-                <button class="btn-secondary" onclick="abrirModal('modalInsumo')">+ Insumo</button>
+                <button class="btn-add" onclick="abrirModal('modalInsumo')">+ Insumo</button>
             </div>
             <table>
                 <thead>
@@ -142,7 +185,7 @@
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="3" style="text-align:center; color:#94a3b8;">Lista vacía.</td></tr>
+                    <tr><td colspan="3" class="empty-state">Lista vacía.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -154,7 +197,7 @@
         <div class="modal-content">
             <div class="section-header" style="border:none;">
                 <h3>Registrar Producto</h3>
-                <button onclick="cerrarModal('modalProducto')" style="background:none;border:none;font-size:1.5em;cursor:pointer;">&times;</button>
+                <button onclick="cerrarModal('modalProducto')" style="background:none;border:none;font-size:1.5em;cursor:pointer;color:#999;">&times;</button>
             </div>
             <form action="{% url 'agregar-producto' %}" method="POST">
                 {% csrf_token %}
@@ -165,7 +208,7 @@
                 <div class="form-group" style="display:flex; gap:10px;">
                     <div style="flex:1;">
                         <label>Precio (S/):</label>
-                        <input type="number" step="0.10" name="precio" required>
+                        <input type="number" step="0.10" name="precio" required min="0" oninput="validarPositivo(this)">
                     </div>
                     <div style="flex:1;">
                         <label>Categoría:</label>
@@ -176,6 +219,7 @@
                         </select>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label>Seleccionar Insumos:</label>
                     <div class="insumos-grid">
@@ -185,15 +229,16 @@
                             {{ insumo.nombre }}
                         </label>
                         {% empty %}
-                        <p style="grid-column: 1/-1; color: #64748b; font-size: 0.9em;">No hay insumos. Agrégalos primero.</p>
+                        <p style="grid-column: 1/-1; color: #999; font-size: 0.9em; text-align:center;">No hay insumos. Agrégalos primero.</p>
                         {% endfor %}
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label>Descripción:</label>
                     <textarea name="descripcion" rows="2"></textarea>
                 </div>
-                <button type="submit" class="btn-primary" style="width:100%;">Guardar Producto</button>
+                <button type="submit" class="btn-submit">Guardar Producto</button>
             </form>
         </div>
     </div>
@@ -202,7 +247,7 @@
         <div class="modal-content" style="max-width: 350px;">
             <div class="section-header" style="border:none;">
                 <h3>Nuevo Insumo</h3>
-                <button onclick="cerrarModal('modalInsumo')" style="background:none;border:none;font-size:1.5em;cursor:pointer;">&times;</button>
+                <button onclick="cerrarModal('modalInsumo')" style="background:none;border:none;font-size:1.5em;cursor:pointer;color:#999;">&times;</button>
             </div>
             <form action="{% url 'agregar-insumo' %}" method="POST">
                 {% csrf_token %}
@@ -214,7 +259,7 @@
                     <label>Stock Inicial:</label>
                     <input type="number" name="stock" value="0" min="0" oninput="validarPositivo(this)" required>
                 </div>
-                <button type="submit" class="btn-secondary" style="width:100%;">Agregar Insumo</button>
+                <button type="submit" class="btn-submit">Agregar Insumo</button>
             </form>
         </div>
     </div>
@@ -223,7 +268,7 @@
         <div class="modal-content" style="max-width: 350px;">
             <div class="section-header" style="border:none;">
                 <h3>Editar Insumo</h3>
-                <button onclick="cerrarModal('modalEditarInsumo')" style="background:none;border:none;font-size:1.5em;cursor:pointer;">&times;</button>
+                <button onclick="cerrarModal('modalEditarInsumo')" style="background:none;border:none;font-size:1.5em;cursor:pointer;color:#999;">&times;</button>
             </div>
             <form action="{% url 'editar-insumo' %}" method="POST">
                 {% csrf_token %}
@@ -237,7 +282,7 @@
                     <label>Stock Actual:</label>
                     <input type="number" name="stock" id="edit_insumo_stock" min="0" oninput="validarPositivo(this)" required>
                 </div>
-                <button type="submit" class="btn-primary" style="width:100%;">Actualizar</button>
+                <button type="submit" class="btn-submit">Actualizar</button>
             </form>
         </div>
     </div>
@@ -246,7 +291,6 @@
         function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
         function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Función para llenar el modal de edición
         function abrirModalEditar(id, nombre, stock) {
             document.getElementById('edit_insumo_id').value = id;
             document.getElementById('edit_insumo_nombre').value = nombre;
@@ -254,7 +298,6 @@
             abrirModal('modalEditarInsumo');
         }
 
-        // Validar que no sea negativo
         function validarPositivo(input) {
             if (input.value < 0) input.value = 0;
         }
