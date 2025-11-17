@@ -1,56 +1,231 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <title>Panel de Administración</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f7f7f7; }
-    h1 { text-align: center; color: #333; }
-    table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
-    th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
-    th { background: #f0f0f0; }
-    button { background: #007BFF; color: white; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
-    button:hover { background: #0056b3; }
-    .acciones button { margin-right: 6px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Productos - Coco's Burger</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        /* Barra de navegación (Estilo Coco's) */
+        .nav-header {
+            background-color: #722f37;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .nav-header h2 { margin: 0; font-size: 1.5em; }
+
+        .btn-nav {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .btn-nav:hover { background-color: rgba(255,255,255,0.3); }
+
+        /* Contenedor Principal */
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+
+        .header-actions {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-add {
+            background-color: #28a745; color: white; border: none;
+            padding: 12px 20px; border-radius: 5px; cursor: pointer;
+            font-size: 1em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .btn-add:hover { background-color: #218838; transform: scale(1.02); }
+
+        /* Tabla de Productos */
+        .product-table {
+            width: 100%; background: white; border-collapse: collapse;
+            border-radius: 8px; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .product-table th, .product-table td {
+            padding: 15px; text-align: left; border-bottom: 1px solid #eee;
+        }
+
+        .product-table th { background-color: #eee; color: #555; font-weight: bold; }
+        .product-table tr:last-child td { border-bottom: none; }
+        .product-table tr:hover { background-color: #f9f9f9; }
+
+        .price-tag { color: #28a745; font-weight: bold; }
+        .category-badge {
+            background-color: #e2e6ea; color: #555; padding: 4px 8px;
+            border-radius: 12px; font-size: 0.85em;
+        }
+
+        .btn-delete {
+            background-color: #dc3545; color: white; border: none;
+            padding: 8px 12px; border-radius: 4px; cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-delete:hover { background-color: #c82333; }
+
+        /* Modal para Agregar Producto */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: none;
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+
+        .modal-content {
+            background: white; padding: 25px; border-radius: 8px;
+            width: 90%; max-width: 400px; position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;
+        }
+        .modal-header h3 { margin: 0; color: #333; }
+        .close-modal {
+            background: none; border: none; font-size: 1.5em; cursor: pointer; color: #999;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 10px; border: 1px solid #ccc;
+            border-radius: 5px; box-sizing: border-box;
+        }
+        .form-group textarea { resize: vertical; height: 80px; }
+
+        .btn-submit {
+            width: 100%; padding: 12px; background-color: #722f37;
+            color: white; border: none; border-radius: 5px;
+            font-size: 1.1em; cursor: pointer; font-weight: bold;
+        }
+        .btn-submit:hover { background-color: #5a2429; }
+
+        .empty-state { text-align: center; padding: 40px; color: #888; }
+
+    </style>
 </head>
 <body>
-  <h1>Panel de Administración</h1>
 
-  <button>+ Nuevo Producto</button>
+    <div class="nav-header">
+        <h2>🍔 Administración de Menú</h2>
+        <div>
+            <a href="{% url 'inicio' %}" class="btn-nav">🏠 Inicio</a>
+            <a href="{% url 'panel-pedidos' %}" class="btn-nav">📋 Ver Pedidos</a>
+        </div>
+    </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Precio</th>
-        <th>Stock</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Café Americano</td>
-        <td>Taza 250ml</td>
-        <td>S/. 6.50</td>
-        <td>20</td>
-        <td class="acciones">
-          <button>Editar</button>
-          <button>Eliminar</button>
-        </td>
-      </tr>
-      <tr>
-        <td>Jugo de Naranja</td>
-        <td>Natural 300ml</td>
-        <td>S/. 8.00</td>
-        <td>12</td>
-        <td class="acciones">
-          <button>Editar</button>
-          <button>Eliminar</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+    <div class="container">
+        <div class="header-actions">
+            <h2 style="color: #333;">Lista de Productos</h2>
+            <button class="btn-add" onclick="abrirModal()">+ Nuevo Producto</button>
+        </div>
+
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td><strong>{{ producto.nombre }}</strong></td>
+                    <td><span class="category-badge">{{ producto.categoria }}</span></td>
+                    <td style="color: #666;">{{ producto.descripcion|default:"-" }}</td>
+                    <td class="price-tag">S/ {{ producto.precio }}</td>
+                    <td>
+                        <a href="{% url 'eliminar-producto' producto.id %}"
+                           class="btn-delete"
+                           onclick="return confirm('¿Estás seguro de eliminar este producto?');">
+                           🗑 Eliminar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state">No hay productos registrados. ¡Agrega uno!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="modalAgregar" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Nuevo Producto</h3>
+                <button class="close-modal" onclick="cerrarModal()">&times;</button>
+            </div>
+
+            <form action="{% url 'agregar-producto' %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Nombre del Producto:</label>
+                    <input type="text" name="nombre" required placeholder="Ej: Hamburguesa Royal">
+                </div>
+
+                <div class="form-group">
+                    <label>Categoría:</label>
+                    <select name="categoria" required>
+                        <option value="Hamburguesas">Hamburguesas</option>
+                        <option value="Bebidas">Bebidas</option>
+                        <option value="Complementos">Complementos</option>
+                        <option value="Postres">Postres</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Precio (S/):</label>
+                    <input type="number" step="0.10" name="precio" required placeholder="0.00">
+                </div>
+
+                <div class="form-group">
+                    <label>Descripción (Opcional):</label>
+                    <textarea name="descripcion" placeholder="Ingredientes principales..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">Guardar Producto</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Lógica sencilla del Modal
+        const modal = document.getElementById('modalAgregar');
+
+        function abrirModal() {
+            modal.style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            modal.style.display = 'none';
+        }
+
+        // Cerrar si se hace click fuera del modal
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                cerrarModal();
+            }
+        }
+    </script>
+
 </body>
 </html>

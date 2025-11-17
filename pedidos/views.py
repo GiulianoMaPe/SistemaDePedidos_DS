@@ -14,40 +14,41 @@ def registrar_pedido_vista(request):
             try:
                 # Parsear el JSON del pedido
                 pedido_json = json.loads(pedido_data)
+                cliente = request.POST.get('cliente', 'Cliente Mostrador')
 
-                # Solicitar nombre del cliente (puedes cambiarlo por un campo en el form)
-                cliente = request.POST.get('cliente', 'Cliente General')
-
-                # Calcular el total
+                # 1. Calcular el total
                 total = 0
                 for item_id, item in pedido_json.items():
                     precio_base = float(item['precioBase'])
                     cantidad = int(item['cantidad'])
-
-                    # Sumar extras
+                    # Sumar precio de extras
                     precio_extras = sum(float(extra['precio']) for extra in item.get('extras', []))
-
                     subtotal = (precio_base + precio_extras) * cantidad
                     total += subtotal
 
-                # Crear el pedido
+                # 2. Crear el Pedido Padre
                 pedido = Pedido.objects.create(
                     cliente=cliente,
                     total=total,
                     estado='En preparación'
                 )
 
-                # Crear los detalles del pedido
+                # 3. Crear los detalles
                 for item_id, item in pedido_json.items():
                     producto_id = item['pId']
                     cantidad = item['cantidad']
+
+                    # PROCESAR EXTRAS: Convertir lista de objetos a string "Queso, Tocino"
+                    lista_extras = [extra['nombre'] for extra in item.get('extras', [])]
+                    texto_personalizacion = ", ".join(lista_extras)
 
                     try:
                         producto = Producto.objects.get(id=producto_id)
                         DetallePedido.objects.create(
                             pedido=pedido,
                             producto=producto,
-                            cantidad=cantidad
+                            cantidad=cantidad,
+                            personalizacion=texto_personalizacion  # ¡Aquí guardamos los datos!
                         )
                     except Producto.DoesNotExist:
                         pass
@@ -56,15 +57,12 @@ def registrar_pedido_vista(request):
                 return redirect('panel-pedidos')
 
             except Exception as e:
-                messages.error(request, f'Error al procesar el pedido: {str(e)}')
+                messages.error(request, f'Error al procesar: {str(e)}')
         else:
             messages.warning(request, 'El carrito está vacío')
 
     productos = Producto.objects.all()
-    contexto = {
-        'productos': productos
-    }
-    return render(request, 'pedidos/registrar_pedido.html', contexto)
+    return render(request, 'pedidos/registrar_pedido.html', {'productos': productos})
 
 
 # HU-02: Personalizar producto

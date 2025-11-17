@@ -24,5 +24,7 @@ class DetallePedido(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     cantidad = models.IntegerField(default=1)
 
+    personalizacion = models.TextField(blank=True, null=True)
+
     def __str__(self):
         return f"{self.cantidad} x {self.producto.nombre} (Pedido {self.pedido.id})"

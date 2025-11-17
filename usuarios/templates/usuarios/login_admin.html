@@ -1,65 +1,493 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Login Administrador</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración - Cocos Burger</title>
     <style>
-        body, html {
-            height: 100%; margin: 0; font-family: Arial, sans-serif;
-            background-color: #333; /* Fondo oscuro */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .login-box {
-            background-color: #444; /* Caja oscura */
-            color: #fff; /* Texto blanco */
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            width: 300px;
-        }
-        h2 { text-align: center; color: #f5c5c5; } /* Título rojo claro */
-        div { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 8px;
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            background-color: #555;
-            border: 1px solid #666;
-            color: white;
-            border-radius: 4px;
         }
-        button {
+
+        body, html {
+            height: 100vh;
+            width: 100vw;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
+
+        .workspace {
+            height: 100vh;
+            width: 100vw;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); /* Fondo Azul Oscuro */
+        }
+
+        /* Panel izquierdo */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4vh 5vw;
+            /* Degradado azul suave */
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.08) 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            /* Grid azul */
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 2px, transparent 2px);
+            background-size: 50px 50px;
+            animation: gridMove 25s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .brand-section {
+            position: relative;
+            z-index: 1;
+        }
+
+        .company-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 3vh;
+        }
+
+        .logo-icon {
+            width: 8vw;
+            height: 8vw;
+            min-width: 100px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            /* Filtro para integrar el logo en el tema azul si es necesario, o dejar natural */
+            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3));
+        }
+
+        .logo-icon img {
             width: 100%;
-            padding: 10px;
-            background-color: #722f37; /* Rojo vino (igual al de la bienvenida) */
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .system-status {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 2vh 1.5vw;
+            margin-bottom: 3vh;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-title {
+            color: #60a5fa; /* Azul claro */
+            font-size: clamp(11px, 0.8vw, 14px);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1.5vh;
+        }
+
+        .status-detail {
+            display: flex;
+            align-items: center;
+            gap: 1vw;
+            padding: 1vh 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.85);
+            font-size: clamp(12px, 0.9vw, 16px);
+        }
+
+        .status-detail:last-child {
+            border-bottom: none;
+        }
+
+        .status-icon {
+            font-size: clamp(18px, 1.3vw, 24px);
+            width: 2vw;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .admin-tools {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(30, 64, 175, 0.05));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 2vh 1.5vw;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .tools-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5vw;
+            font-weight: 700;
+            font-size: clamp(12px, 0.85vw, 15px);
+            margin-bottom: 1.5vh;
+            color: #60a5fa;
+        }
+
+        .admin-tools ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .admin-tools li {
+            padding: 0.8vh 0;
+            padding-left: 1.5vw;
+            position: relative;
+            font-size: clamp(11px, 0.8vw, 14px);
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .admin-tools li::before {
+            content: '⚙';
+            position: absolute;
+            left: 0;
+            color: #60a5fa;
+            font-size: 0.9em;
+        }
+
+        /* Panel derecho */
+        .right-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4vh 5vw;
+            background: #020617; /* Casi negro/azul */
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .login-header {
+            margin-bottom: 3vh;
+        }
+
+        .session-title {
             color: white;
-            font-weight: bold;
+            font-size: clamp(26px, 2vw, 36px);
+            font-weight: 800;
+            margin-bottom: 1vh;
+        }
+
+        .session-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: clamp(13px, 0.9vw, 16px);
+            line-height: 1.6;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6vw;
+            /* Badge Azul */
+            background: rgba(37, 99, 235, 0.15);
+            border: 1.5px solid rgba(37, 99, 235, 0.4);
+            padding: 1vh 1.5vw;
+            border-radius: 10px;
+            margin: 2vh 0 3vh;
+            font-weight: 600;
+            color: #60a5fa;
+            font-size: clamp(11px, 0.8vw, 14px);
+            letter-spacing: 0.5px;
+        }
+
+        .secure-indicator {
+            width: 10px;
+            height: 10px;
+            background: #3b82f6;
+            border-radius: 2px;
+            box-shadow: 0 0 10px #3b82f6;
+        }
+
+        .form-field {
+            margin-bottom: 2.5vh;
+        }
+
+        .field-label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: clamp(12px, 0.8vw, 14px);
+            font-weight: 600;
+            margin-bottom: 1vh;
+            letter-spacing: 0.3px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 1.2vw;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: clamp(18px, 1.2vw, 22px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            color: #64748b;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            height: clamp(50px, 5.5vh, 60px);
+            padding: 0 1.2vw 0 3.5vw;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: clamp(14px, 0.9vw, 16px);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]::placeholder,
+        input[type="password"]::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #3b82f6; /* Borde Azul */
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        .input-group input:focus ~ .field-icon {
+            color: #3b82f6;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            height: clamp(55px, 6vh, 65px);
+            margin-top: 2vh;
+            /* Gradiente Azul Profesional */
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
             border: none;
-            border-radius: 5px;
+            border-radius: 12px;
+            color: white;
+            font-size: clamp(14px, 1vw, 17px);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
             cursor: pointer;
-            font-size: 1.1em;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 35px rgba(37, 99, 235, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 45px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-login:hover::before {
+            left: 100%;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1vw;
+            margin-top: 3vh;
+            padding-top: 3vh;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5vh 1vw;
+            text-align: center;
+        }
+
+        .stat-value {
+            color: #3b82f6; /* Valor Azul */
+            font-size: clamp(20px, 1.6vw, 28px);
+            font-weight: 800;
+            margin-bottom: 0.5vh;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: clamp(10px, 0.7vw, 12px);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .system-footer {
+            margin-top: 2vh;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: clamp(10px, 0.7vw, 12px);
+        }
+
+        @media (max-width: 1024px) {
+            .workspace {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+            .left-panel { padding: 3vh 4vw; }
+            .right-panel { padding: 3vh 4vw; }
         }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h2>Inicio de Sesión (Admin)</h2>
+    <div class="workspace">
+        <div class="left-panel">
+            <div class="brand-section">
+                <div class="company-logo">
+                    <div class="logo-icon">
+                        <img src="{% static 'Images/logococos.png' %}" alt="Logo">
+                    </div>
+                </div>
 
-        <form method="post">
-            {% csrf_token %}
-            <div>
-                <label for="usuario">Usuario:</label>
-                <input type="text" id="usuario" name="usuario">
+                <div class="system-status">
+                    <div class="status-title">Estado del Sistema</div>
+                    <div class="status-detail">
+                        <span class="status-icon">📊</span>
+                        <span>Base de Datos: <strong>En Línea</strong></span>
+                    </div>
+                    <div class="status-detail">
+                        <span class="status-icon">🔒</span>
+                        <span>Seguridad: <strong>Activa</strong></span>
+                    </div>
+                    <div class="status-detail">
+                        <span class="status-icon">📅</span>
+                        <span id="current-date">Cargando fecha...</span>
+                    </div>
+                </div>
+
+                <div class="admin-tools">
+                    <div class="tools-title">
+                        <span>🛠️</span>
+                        <span>Módulos Disponibles</span>
+                    </div>
+                    <ul>
+                        <li>Gestión de Inventario y Productos</li>
+                        <li>Administración de Usuarios y Roles</li>
+                        <li>Reportes de Ventas y Auditoría</li>
+                    </ul>
+                </div>
             </div>
-            <div>
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" name="password">
+        </div>
+
+        <div class="right-panel">
+            <div class="login-container">
+                <div class="login-header">
+                    <h1 class="session-title">PANEL ADMINISTRATIVO</h1>
+                    <p class="session-subtitle">
+                        Acceso restringido. Ingrese sus credenciales maestras para continuar.
+                    </p>
+                    <div class="role-badge">
+                        <span class="secure-indicator"></span>
+                        <span>ACCESO SEGURO - ADMIN</span>
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-field">
+                        <label class="field-label" for="usuario">ID Administrador</label>
+                        <div class="input-group">
+                            <input
+                                type="text"
+                                id="usuario"
+                                name="usuario"
+                                placeholder="Ej: admin.gerencia"
+                                required
+                                autocomplete="username"
+                                autofocus
+                            >
+                            <span class="field-icon">🛡️</span>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="field-label" for="password">Clave de Acceso</label>
+                        <div class="input-group">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="••••••••"
+                                required
+                                autocomplete="current-password"
+                            >
+                            <span class="field-icon">🔑</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-login">
+                         Acceder al Panel
+                    </button>
+                </form>
+
+                <div class="quick-stats">
+                    <div class="stat-box">
+                        <div class="stat-value">Admin</div>
+                        <div class="stat-label">Nivel</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">v2.0</div>
+                        <div class="stat-label">Versión</div>
+                    </div>
+                </div>
+
+                <div class="system-footer">
+                    Coco's Burger Management System © 2025
+                </div>
             </div>
-            <button type="submit">Ingresar</button>
-        </form>
+        </div>
     </div>
+
+    <script>
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', options);
+        }
+        updateDate();
+    </script>
 </body>
 </html>
