@@ -4,127 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Pedidos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .pedido-card {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .pedido-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-        .pedido-info {
-            margin-bottom: 15px;
-        }
-        .estado-badge {
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .estado-preparacion {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-        .estado-listo {
-            background-color: #d1ecf1;
-            color: #0c5460;
-        }
-        .estado-entregado {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .estado-cancelado {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .acciones {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        .btn-preparacion {
-            background-color: #ffc107;
-            color: #000;
-        }
-        .btn-listo {
-            background-color: #17a2b8;
-            color: white;
-        }
-        .btn-entregado {
-            background-color: #28a745;
-            color: white;
-        }
-        .btn-cancelado {
-            background-color: #dc3545;
-            color: white;
-        }
-        .btn:hover {
-            opacity: 0.8;
-            transform: translateY(-2px);
-        }
-        .detalles {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        .nav-bar {
-            background-color: #722f37;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .nav-bar h1 {
-            color: white;
-            margin: 0;
-        }
-        .btn-registrar {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        .btn-registrar:hover {
-            background-color: #218838;
-        }
+        /* ... Tus estilos CSS existentes ... */
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        h1 { color: #333; text-align: center; }
+        .pedido-card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .pedido-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .pedido-info { margin-bottom: 15px; }
+
+        .estado-badge { padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; display: inline-flex; align-items: center; gap: 5px; }
+        .estado-preparacion { background-color: #fff3cd; color: #856404; }
+        .estado-listo { background-color: #d1ecf1; color: #0c5460; }
+        .estado-entregado { background-color: #d4edda; color: #155724; }
+        .estado-cancelado { background-color: #f8d7da; color: #721c24; }
+
+        .acciones { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-preparacion { background-color: #ffc107; color: #000; }
+        .btn-listo { background-color: #17a2b8; color: white; }
+        .btn-entregado { background-color: #28a745; color: white; }
+        .btn-cancelado { background-color: #dc3545; color: white; }
+        .btn:hover { opacity: 0.8; transform: translateY(-2px); }
+
+        .detalles { background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-top: 10px; }
+        .nav-bar { background-color: #722f37; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px; color: white; margin-bottom: 20px; }
+        .nav-bar h1 { color: white; margin: 0; font-size: 1.5em; }
+
+        .btn-registrar { background-color: #28a745; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; transition: background-color 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-registrar:hover { background-color: #218838; }
     </style>
 </head>
 <body>
-<div class="nav-bar">
-        <h1>🍔 Panel de Pedidos</h1>
-        <a href="{% url 'registrar-pedido' %}" class="btn-registrar">➕ Registrar Nuevo Pedido</a>
+    <div class="nav-bar">
+        <h1><i class="fa-solid fa-burger"></i> Panel de Pedidos</h1>
+        <a href="{% url 'registrar-pedido' %}" class="btn-registrar">
+            <i class="fa-solid fa-plus"></i> Registrar Nuevo Pedido
+        </a>
     </div>
-    <h1>🍔 Panel de Pedidos</h1>
 
     {% if pedidos %}
         {% for pedido in pedidos %}
@@ -132,7 +49,9 @@
             <div class="pedido-header">
                 <div>
                     <h2 style="margin: 0;">Pedido #{{ pedido.id }}</h2>
-                    <p style="margin: 5px 0; color: #666;">{{ pedido.fecha|date:"d/m/Y H:i" }}</p>
+                    <p style="margin: 5px 0; color: #666;">
+                        <i class="fa-regular fa-clock"></i> {{ pedido.fecha|date:"d/m/Y H:i" }}
+                    </p>
                 </div>
                 <span class="estado-badge
                     {% if pedido.estado == 'En preparación' %}estado-preparacion
@@ -140,19 +59,32 @@
                     {% elif pedido.estado == 'Entregado' %}estado-entregado
                     {% elif pedido.estado == 'Cancelado' %}estado-cancelado
                     {% endif %}">
+
+                    {% if pedido.estado == 'En preparación' %}<i class="fa-solid fa-fire-burner"></i>
+                    {% elif pedido.estado == 'Listo para entregar' %}<i class="fa-solid fa-bell-concierge"></i>
+                    {% elif pedido.estado == 'Entregado' %}<i class="fa-solid fa-check-circle"></i>
+                    {% elif pedido.estado == 'Cancelado' %}<i class="fa-solid fa-ban"></i>
+                    {% endif %}
                     {{ pedido.estado }}
                 </span>
             </div>
 
             <div class="pedido-info">
-                <p><strong>Cliente:</strong> {{ pedido.cliente }}</p>
-                <p><strong>Total:</strong> ${{ pedido.total }}</p>
+                <p><strong><i class="fa-solid fa-user"></i> Cliente:</strong> {{ pedido.cliente }}</p>
+                <p><strong><i class="fa-solid fa-money-bill"></i> Total:</strong> ${{ pedido.total }}</p>
 
                 <div class="detalles">
-                    <strong>Productos:</strong>
+                    <strong><i class="fa-solid fa-utensils"></i> Productos:</strong>
                     <ul style="margin: 5px 0;">
                         {% for detalle in pedido.detalles.all %}
-                        <li>{{ detalle.cantidad }}x {{ detalle.producto.nombre }}</li>
+                        <li>
+                            {{ detalle.cantidad }}x {{ detalle.producto.nombre }}
+                            {% if detalle.personalizacion %}
+                                <br><small style="color: #dc3545; margin-left: 20px;">
+                                    <i class="fa-solid fa-comment-dots"></i> {{ detalle.personalizacion }}
+                                </small>
+                            {% endif %}
+                        </li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -162,32 +94,35 @@
                 <form method="POST" action="{% url 'actualizar-estado' pedido.id %}" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="estado" value="En preparación">
-                    <button type="submit" class="btn btn-preparacion">En preparación</button>
+                    <button type="submit" class="btn btn-preparacion"><i class="fa-solid fa-fire"></i> Preparando</button>
                 </form>
 
                 <form method="POST" action="{% url 'actualizar-estado' pedido.id %}" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="estado" value="Listo para entregar">
-                    <button type="submit" class="btn btn-listo">Listo para entregar</button>
+                    <button type="submit" class="btn btn-listo"><i class="fa-solid fa-bell"></i> Listo</button>
                 </form>
 
                 <form method="POST" action="{% url 'actualizar-estado' pedido.id %}" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="estado" value="Entregado">
-                    <button type="submit" class="btn btn-entregado">Entregado</button>
+                    <button type="submit" class="btn btn-entregado"><i class="fa-solid fa-check"></i> Entregado</button>
                 </form>
 
                 <form method="POST" action="{% url 'actualizar-estado' pedido.id %}" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="estado" value="Cancelado">
-                    <button type="submit" class="btn btn-cancelado">Cancelado</button>
+                    <button type="submit" class="btn btn-cancelado"><i class="fa-solid fa-xmark"></i> Cancelar</button>
                 </form>
             </div>
         </div>
         {% endfor %}
     {% else %}
         <div class="pedido-card" style="text-align: center;">
-            <p style="font-size: 18px; color: #666;">No hay pedidos activos en este momento</p>
+            <p style="font-size: 18px; color: #666;">
+                <i class="fa-solid fa-inbox" style="font-size: 2em; display:block; margin-bottom:10px;"></i>
+                No hay pedidos activos en este momento
+            </p>
         </div>
     {% endif %}
 </body>

@@ -13,7 +13,6 @@ def administrar_productos_vista(request):
     }
     return render(request, 'productos/admin_productos.html', contexto)
 
-
 def agregar_producto_vista(request):
     if request.method == 'POST':
         try:
@@ -48,6 +47,36 @@ def agregar_producto_vista(request):
 
     return redirect('admin-productos')
 
+def editar_producto_vista(request):
+    if request.method == 'POST':
+        producto_id = request.POST.get('producto_id')
+        producto = get_object_or_404(Producto, id=producto_id)
+
+        try:
+            producto.nombre = request.POST.get('nombre')
+            producto.categoria = request.POST.get('categoria')
+            producto.descripcion = request.POST.get('descripcion')
+
+            precio_input = request.POST.get('precio')
+            try:
+                precio = float(precio_input)
+                producto.precio = 0.0 if precio < 0 else precio
+            except ValueError:
+                producto.precio = 0.0
+
+            insumos_ids = request.POST.getlist('insumos_ids')
+            insumos_ids = [int(id) for id in insumos_ids]
+
+            producto.insumos.set(insumos_ids)
+
+            producto.save()
+            messages.success(request, f'Producto "{producto.nombre}" actualizado.')
+
+        except Exception as e:
+            messages.error(request, f'Error al editar: {e}')
+
+    return redirect('admin-productos')
+
 def eliminar_producto_vista(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     producto.delete()
@@ -59,17 +88,21 @@ def agregar_insumo_vista(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre').strip()
         stock = request.POST.get('stock', 0)
+        precio = request.POST.get('precio', 0)
 
-        # Verificar duplicados
         if Insumo.objects.filter(nombre__iexact=nombre).exists():
             messages.error(request, f'¡El insumo "{nombre}" ya existe!')
             return redirect('admin-productos')
 
         try:
-            Insumo.objects.create(nombre=nombre, stock=stock)
+            Insumo.objects.create(
+                nombre=nombre,
+                stock=stock,
+                precio=precio
+            )
             messages.success(request, 'Insumo agregado.')
         except Exception as e:
-            messages.error(request, 'Error al guardar insumo.')
+            messages.error(request, f'Error al guardar insumo: {e}')
 
     return redirect('admin-productos')
 
@@ -79,10 +112,10 @@ def editar_insumo_vista(request):
         insumo_id = request.POST.get('insumo_id')
         nuevo_nombre = request.POST.get('nombre')
         nuevo_stock = request.POST.get('stock')
+        nuevo_precio = request.POST.get('precio')
 
         insumo = get_object_or_404(Insumo, id=insumo_id)
 
-        # Validar nombre duplicado solo si cambió el nombre
         if insumo.nombre.lower() != nuevo_nombre.lower():
             if Insumo.objects.filter(nombre__iexact=nuevo_nombre).exists():
                 messages.error(request, 'Ya existe otro insumo con ese nombre.')
@@ -90,6 +123,7 @@ def editar_insumo_vista(request):
 
         insumo.nombre = nuevo_nombre
         insumo.stock = nuevo_stock
+        insumo.precio = nuevo_precio
         insumo.save()
         messages.success(request, 'Insumo actualizado correctamente.')
 

@@ -5,263 +5,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Pedido - Coco's Burger</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body, html {
-            height: 100vh; margin: 0; font-family: Arial, sans-serif;
-            background-color: #f0f0f0; overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+        /* ... (Todos tus estilos anteriores) ... */
+        body, html { height: 100vh; margin: 0; font-family: Arial, sans-serif; background-color: #f0f0f0; overflow: hidden; display: flex; flex-direction: column; }
+        .nav-header { background-color: #722f37; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex-shrink: 0; }
+        .nav-header h2 { margin: 0; font-size: 1.5em; display: flex; align-items: center; gap: 10px; }
 
-        /* Barra de navegación superior */
-        .nav-header {
-            background-color: #722f37;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            flex-shrink: 0;
-        }
+        .panel-btn { background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1em; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: background-color 0.3s; }
+        .panel-btn:hover { background-color: #218838; }
 
-        .nav-header h2 {
-            margin: 0;
-            font-size: 1.5em;
-        }
+        .btn-exit { background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1em; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: background-color 0.3s; margin-left: 10px; }
+        .btn-exit:hover { background-color: #c82333; }
 
-        .panel-btn {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            text-decoration: none;
-            display: inline-block;
-            transition: background-color 0.3s;
-        }
-
-        .panel-btn:hover {
-            background-color: #218838;
-        }
-
-        .main-container {
-            display: flex;
-            flex-grow: 1;
-            overflow: hidden;
-        }
-
+        /* ... (resto de estilos) ... */
+        .main-container { display: flex; flex-grow: 1; overflow: hidden; }
         .menu-container { width: 65%; display: flex; flex-direction: column; border-right: 1px solid #ccc; }
-        .product-grid {
-            flex-grow: 1; overflow-y: auto; padding: 20px;
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
-        }
+        .product-grid { flex-grow: 1; overflow-y: auto; padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .product-card { background-color: white; border: 1px solid #ddd; border-radius: 8px; padding: 10px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .product-card img { width: 100%; height: 100px; object-fit: cover; border-radius: 5px; }
+        .product-name { font-weight: bold; margin: 10px 0 5px 0; }
+        .product-price { color: #28a745; font-size: 1.1em; }
 
-        .product-card {
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
+        .action-bar { flex-shrink: 0; padding: 20px; background-color: #fff; border-top: 1px solid #ccc; box-shadow: 0 -2px 5px rgba(0,0,0,0.05); }
 
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
+        .client-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 1.1em; outline: none; }
+        .client-input:focus { border-color: #722f37; box-shadow: 0 0 5px rgba(114, 47, 55, 0.2); }
 
-        .product-card img {
-            width: 100%;
-            border-radius: 5px;
-        }
+        .confirm-button { width: 100%; padding: 15px; background-color: #722f37; color: white; border: none; border-radius: 5px; font-size: 1.2em; cursor: pointer; transition: background-color 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .confirm-button:hover { background-color: #5a2429; }
 
-        .product-name {
-            font-weight: bold;
-            margin: 10px 0 5px 0;
-        }
-
-        .product-price {
-            color: #28a745;
-            font-size: 1.1em;
-        }
-
-        .action-bar {
-            flex-shrink: 0; padding: 20px; background-color: #fff;
-            border-top: 1px solid #ccc; box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
-        }
-
-        .confirm-button {
-            width: 100%;
-            padding: 15px;
-            background-color: #722f37;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .confirm-button:hover {
-            background-color: #5a2429;
-        }
-
-        .ticket-container {
-            width: 35%; display: flex; flex-direction: column;
-            background-color: #ffffff; height: 100%;
-        }
-        .ticket-header {
-            padding: 20px; background-color: #722f37;
-            color: white; text-align: center;
-        }
+        .ticket-container { width: 35%; display: flex; flex-direction: column; background-color: #ffffff; height: 100%; }
+        .ticket-header { padding: 20px; background-color: #6e151b; color: white; text-align: center; }
         .ticket-items { flex-grow: 1; overflow-y: auto; padding: 15px; position: relative; }
-        .ticket-total {
-            flex-shrink: 0; padding: 20px; border-top: 2px dashed #ccc;
-            font-size: 1.5em; font-weight: bold;
-            display: flex; justify-content: space-between;
-        }
+        .ticket-total { flex-shrink: 0; padding: 20px; border-top: 2px dashed #ccc; font-size: 1.5em; font-weight: bold; display: flex; justify-content: space-between; }
         .ticket-items ul { list-style: none; padding: 0; margin: 0; }
-        #empty-cart-message {
-            text-align: center; color: #888; margin-top: 30px; display: block;
-        }
-        /* Estilos de Ticket */
-        .ticket-item {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            padding: 10px 0; border-bottom: 1px solid #eee;
-            flex-wrap: wrap;
-        }
-        .item-main-row {
-            display: flex; justify-content: space-between; width: 100%; align-items: center;
-        }
-        .item-info-name {
-            display: flex; align-items: center; gap: 5px; cursor: pointer;
-            font-weight: bold;
-        }
-        .ticket-item-controls {
-            display: flex; align-items: center; gap: 5px; white-space: nowrap;
-        }
-        .remove-btn, .ticket-item-controls button {
-            background-color: #722f37; color: white; border: none; border-radius: 4px;
-            width: 24px; height: 24px; cursor: pointer; line-height: 1;
-        }
+
+        .ticket-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #eee; flex-wrap: wrap; }
+        .item-main-row { display: flex; justify-content: space-between; width: 100%; align-items: center; }
+        .item-info-name { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: bold; }
+        .ticket-item-controls { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+        .remove-btn, .ticket-item-controls button { background-color: #722f37; color: white; border: none; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; line-height: 1; display: flex; justify-content: center; align-items: center; }
         .remove-btn { background-color: #dc3545; }
 
-        /* Estilos para el Dropdown de Personalización */
-        .item-customization-area {
-            width: 100%; padding: 10px 0 0 15px;
-            font-size: 0.9em;
-            display: none;
-        }
-        .item-customization-area.open {
-            display: block;
-        }
+        .item-customization-area { width: 100%; padding: 10px 0 0 15px; font-size: 0.9em; display: none; }
+        .item-customization-area.open { display: block; }
         .ingredient-list { list-style: none; padding: 0; margin: 5px 0 10px 0; }
-        .ingredient-item {
-            cursor: pointer; padding: 3px 0;
-            display: flex; justify-content: space-between;
-        }
+        .ingredient-item { cursor: pointer; padding: 3px 0; display: flex; justify-content: space-between; }
         .ingredient-item:hover { background-color: #f7f7f7; }
-        .ingredient-item.removed .ing-name {
-            text-decoration: line-through;
-            color: #aaa;
-        }
-        .ingredient-item.extra .ing-name {
-            color: #007bff;
-            font-weight: bold;
-        }
-        .add-extra-btn {
-            background-color: #28a745; color: white; border: none;
-            padding: 5px 10px; border-radius: 4px; cursor: pointer;
-            margin-top: 5px;
-        }
-        /* Estilos del Modal */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); display: none;
-            justify-content: center; align-items: center; z-index: 1000;
-        }
-        .modal-content {
-            background-color: white; padding: 20px; border-radius: 10px;
-            width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            position: relative;
-        }
-        .modal-header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;
-        }
-        .modal-close {
-            background: none; border: none; font-size: 1.5em; cursor: pointer;
-            color: #aaa;
-        }
-        .extra-option {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px; border-bottom: 1px solid #f5f5f5; cursor: pointer;
-            border-radius: 4px;
-        }
+        .ingredient-item.removed .ing-name { text-decoration: line-through; color: #aaa; }
+        .ingredient-item.extra .ing-name { color: #007bff; font-weight: bold; }
+
+        .add-extra-btn { background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-top: 5px; display:inline-flex; align-items:center; gap:5px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background-color: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); position: relative; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+        .modal-close { background: none; border: none; font-size: 1.5em; cursor: pointer; color: #aaa; }
+        .extra-option { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f5f5f5; cursor: pointer; border-radius: 4px; }
         .extra-option:hover { background-color: #f9f9f9; }
-        .extra-option.selected {
-            background-color: #e6f7ff;
-            border: 1px solid #007bff;
-        }
+        .extra-option.selected { background-color: #e6f7ff; border: 1px solid #007bff; }
         .extra-info { font-weight: bold; }
         .extra-price { color: #28a745; font-size: 0.9em; }
-        .modal-footer {
-            margin-top: 20px; text-align: right;
-        }
-        .save-btn {
-            padding: 10px 20px; background-color: #28a745; color: white;
-            border: none; border-radius: 5px; cursor: pointer;
-            font-size: 1em;
-        }
+        .modal-footer { margin-top: 20px; text-align: right; }
+        .save-btn { padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; }
     </style>
 </head>
 <body>
 
-<!-- Barra de navegación superior -->
 <div class="nav-header">
-    <h2>🍔 Coco's Burger - Registrar Pedido</h2>
-    <a href="{% url 'panel-pedidos' %}" class="panel-btn">📋 Ver Panel de Pedidos</a>
+    <h2><i class="fa-solid fa-burger"></i> Registrar Pedido</h2>
+    <div>
+        <a href="{% url 'panel-pedidos' %}" class="panel-btn"><i class="fa-solid fa-clipboard-list"></i> Ver Panel de Pedidos</a>
+        <a href="{% url 'inicio' %}" class="btn-exit"><i class="fa-solid fa-door-open"></i> Salir</a>
+    </div>
 </div>
 
 <div class="main-container">
-
     <div class="menu-container">
         <div class="product-grid">
-            <button class="product-card" onclick="agregarAlPedido(1,'Hamburguesa Clásica',12.50, ['Lechuga', 'Tomate', 'Cebolla', 'Salsa Clásica'])">
-                <img src="https://via.placeholder.com/150x90?text=Clásica" alt="Hamburguesa Clásica">
-                <div class="product-name">Hamburguesa Clásica</div>
-                <div class="product-price">S/ 12.50</div>
+            {% for p in productos %}
+            <button class="product-card"
+                onclick="agregarAlPedido({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, [{% for i in p.insumos.all %}'{{ i.nombre }}'{% if not forloop.last %}, {% endif %}{% endfor %}])">
+
+                {% if p.imagen %}
+                    <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/150x90?text=Sin+Imagen" alt="{{ p.nombre }}">
+                {% endif %}
+
+                <div class="product-name">{{ p.nombre }}</div>
+                <div class="product-price">S/ {{ p.precio }}</div>
             </button>
-            <button class="product-card" onclick="agregarAlPedido(2,'Hamburguesa BBQ',14.00, ['Lechuga', 'Cebolla Crujiente', 'Tocino', 'Salsa BBQ'])">
-                <img src="https://via.placeholder.com/150x90?text=BBQ" alt="Hamburguesa BBQ">
-                <div class="product-name">Hamburguesa BBQ</div>
-                <div class="product-price">S/ 14.00</div>
-            </button>
-            <button class="product-card" onclick="agregarAlPedido(3,'Hamburguesa Doble',18.50, ['Doble Carne', 'Doble Queso', 'Pepinillos', 'Salsa Especial'])">
-                <img src="https://via.placeholder.com/150x90?text=Doble" alt="Hamburguesa Doble">
-                <div class="product-name">Hamburguesa Doble</div>
-                <div class="product-price">S/ 18.50</div>
-            </button>
+            {% empty %}
+            <div style="grid-column: 1/-1; text-align:center; padding:20px; color:#666;">
+                No hay productos registrados.
+            </div>
+            {% endfor %}
         </div>
 
         <div class="action-bar">
             <form method="POST" action="">
                 {% csrf_token %}
                 <input type="hidden" name="pedido_data" id="pedido_data_input">
-                <button type="submit" class="confirm-button">Confirmar Compra</button>
+                <input type="text" name="cliente" class="client-input" placeholder="Nombre del Cliente (Opcional)" autocomplete="off">
+                <button type="submit" class="confirm-button"><i class="fa-solid fa-check"></i> Confirmar Compra</button>
             </form>
         </div>
     </div>
 
     <div class="ticket-container">
-        <div class="ticket-header"><h3>Mi Pedido</h3></div>
+        <div class="ticket-header"><h3><i class="fa-solid fa-receipt"></i> Pedido</h3></div>
 
         <div class="ticket-items">
-            <p id="empty-cart-message">Tu pedido está vacío</p>
+            <p id="empty-cart-message" style="text-align:center; color:#888; margin-top:30px;">
+                <i class="fa-solid fa-cart-shopping" style="font-size: 3em; color:#ddd; display:block; margin-bottom:10px;"></i>
+                Tu pedido está vacío
+            </p>
             <ul id="order-items-list"></ul>
         </div>
 
@@ -272,89 +133,24 @@
     </div>
 </div>
 
-
 <div id="extras-modal" class="modal-overlay" onclick="if(event.target.id === 'extras-modal') cerrarModalExtras()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <div class="modal-header">
-            <h4 id="modal-product-name">Añadir Extras Adicionales</h4>
-            <button class="modal-close" onclick="cerrarModalExtras()">&times;</button>
+            <h4 id="modal-product-name">Añadir Extras</h4>
+            <button class="modal-close" onclick="cerrarModalExtras()"><i class="fa-solid fa-xmark"></i></button>
         </div>
-
-        <div id="extras-list-container">
-        </div>
-
+        <div id="extras-list-container"></div>
         <div class="modal-footer">
-            <button class="save-btn" onclick="guardarExtrasModal()">Añadir Extras</button>
+            <button class="save-btn" onclick="guardarExtrasModal()">Añadir</button>
         </div>
     </div>
 </div>
 
 <script>
+    const ingredientesExtra = {{ extras_json|safe }};
     let pedido = {};
     let itemIdCounter = 1;
     let currentEditingItemId = null;
-
-    const ingredientesExtra = [
-        { id: 101, nombre: 'Queso Cheddar Extra', precio: 2.00 },
-        { id: 102, nombre: 'Tocino Ahumado', precio: 3.50 },
-        { id: 103, nombre: 'Pepinillos Extra', precio: 1.00 },
-        { id: 104, nombre: 'Huevo Frito', precio: 1.50 },
-        { id: 105, nombre: 'Aguacate (Palta)', precio: 4.00 },
-        { id: 106, nombre: 'Champiñones Salteados', precio: 2.50 }
-    ];
-
-    function agregarAlPedido(pId, nombre, precio, ingredientesBase) {
-        const idUnico = itemIdCounter++;
-        document.getElementById('empty-cart-message').style.display = 'none';
-
-        pedido[idUnico] = {
-            pId: pId,
-            nombre: nombre,
-            precioBase: parseFloat(precio),
-            cantidad: 1,
-            ingredientesBase: ingredientesBase.map(ing => ({ nombre: ing, removed: false })),
-            extras: []
-        };
-
-        actualizarTicket();
-    }
-
-    function cambiarCantidad(itemId, delta) {
-        if (!pedido[itemId]) return;
-        const item = pedido[itemId];
-        item.cantidad += delta;
-        if (item.cantidad <= 0) eliminarItem(itemId);
-        else actualizarTicket();
-    }
-
-    function eliminarItem(itemId) {
-        delete pedido[itemId];
-        actualizarTicket();
-    }
-
-    function toggleCustomization(itemId) {
-        const area = document.getElementById(`custom-area-${itemId}`);
-        area.classList.toggle('open');
-    }
-
-    function toggleBaseIngredient(itemId, ingName, element) {
-        const item = pedido[itemId];
-        if (!item) return;
-        const ingredient = item.ingredientesBase.find(ing => ing.nombre === ingName);
-        if (ingredient) {
-            ingredient.removed = !ingredient.removed;
-            element.classList.toggle('removed', ingredient.removed);
-        }
-    }
-
-    function calcularPrecioItem(item) {
-        let precioUnitario = item.precioBase;
-        if (item.extras && item.extras.length > 0) {
-            const precioExtras = item.extras.reduce((acc, extra) => acc + extra.precio, 0);
-            precioUnitario += precioExtras;
-        }
-        return precioUnitario * item.cantidad;
-    }
 
     function actualizarTicket() {
         const itemList = document.getElementById('order-items-list');
@@ -384,109 +180,81 @@
             li.className = 'ticket-item';
 
             let customizationHtml = '<ul class="ingredient-list">';
-
             item.ingredientesBase.forEach(ing => {
                 const removedClass = ing.removed ? 'removed' : '';
                 customizationHtml += `
                     <li class="ingredient-item ${removedClass}" onclick="toggleBaseIngredient('${itemId}', '${ing.nombre}', this)">
-                        <span class="ing-name">${ing.nombre} (Base)</span>
-                        <span class="ing-status">${ing.removed ? 'QUITADO' : 'INCLUIDO'}</span>
+                        <span class="ing-name">${ing.nombre}</span>
+                        <span class="ing-status">${ing.removed ? '<i class="fa-solid fa-ban" style="color:#dc3545"></i>' : '<i class="fa-solid fa-check" style="color:#28a745"></i>'}</span>
                     </li>`;
             });
-
             item.extras.forEach(extra => {
                 customizationHtml += `
                     <li class="ingredient-item extra">
                         <span class="ing-name">+ ${extra.nombre}</span>
-                        <span class="ing-price">S/ ${extra.precio.toFixed(2)}</span>
+                        <span class="ing-price">S/ ${parseFloat(extra.precio).toFixed(2)}</span>
                     </li>`;
             });
-
             customizationHtml += '</ul>';
-            customizationHtml += `<button class="add-extra-btn" onclick="mostrarModalExtras('${itemId}')">Añadir/Quitar Extras</button>`;
+            customizationHtml += `<button class="add-extra-btn" onclick="mostrarModalExtras('${itemId}')"><i class="fa-solid fa-plus-circle"></i> Extras</button>`;
 
             li.innerHTML = `
                 <div class="item-main-row">
                     <div class="item-info-name" onclick="toggleCustomization('${itemId}')">
                         <span style="font-size: 1.2em;">${item.nombre}</span>
-                        <span class="dropdown-arrow" style="font-size: 0.8em; transition: transform 0.2s;">&#9660;</span>
+                        <span class="dropdown-arrow" style="font-size: 0.8em; transition: transform 0.2s;"><i class="fa-solid fa-chevron-down"></i></span>
                     </div>
                     <div class="ticket-item-controls">
-                        <button onclick="cambiarCantidad('${itemId}', -1)">-</button>
-                        <span>${item.cantidad}</span>
-                        <button onclick="cambiarCantidad('${itemId}', 1)">+</button>
-                        <span class="ticket-item-price" style="font-weight: bold;">S/ ${subtotal.toFixed(2)}</span>
-                        <button class="remove-btn" onclick="eliminarItem('${itemId}')">X</button>
+                        <button onclick="cambiarCantidad('${itemId}', -1)"><i class="fa-solid fa-minus"></i></button>
+                        <span style="margin:0 5px;">${item.cantidad}</span>
+                        <button onclick="cambiarCantidad('${itemId}', 1)"><i class="fa-solid fa-plus"></i></button>
+                        <span class="ticket-item-price" style="font-weight: bold; margin-left:5px;">S/ ${subtotal.toFixed(2)}</span>
+                        <button class="remove-btn" style="margin-left:10px;" onclick="eliminarItem('${itemId}')"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>
                 <div class="item-customization-area" id="custom-area-${itemId}">
-                    <h4>Personalización:</h4>
                     ${customizationHtml}
                 </div>`;
             itemList.appendChild(li);
         }
-
         totalElement.textContent = `S/ ${total.toFixed(2)}`;
         pedidoDataInput.value = JSON.stringify(pedido);
     }
 
+    function agregarAlPedido(pId, nombre, precio, ingredientesBase) {
+        const idUnico = itemIdCounter++;
+        document.getElementById('empty-cart-message').style.display = 'none';
+        pedido[idUnico] = { pId: pId, nombre: nombre, precioBase: parseFloat(precio), cantidad: 1, ingredientesBase: ingredientesBase.map(ing => ({ nombre: ing, removed: false })), extras: [] };
+        actualizarTicket();
+    }
+    function cambiarCantidad(itemId, delta) { if (!pedido[itemId]) return; const item = pedido[itemId]; item.cantidad += delta; if (item.cantidad <= 0) eliminarItem(itemId); else actualizarTicket(); }
+    function eliminarItem(itemId) { delete pedido[itemId]; actualizarTicket(); }
+    function toggleCustomization(itemId) { const area = document.getElementById(`custom-area-${itemId}`); if(area) area.classList.toggle('open'); }
+    function toggleBaseIngredient(itemId, ingName, element) { const item = pedido[itemId]; if (!item) return; const ingredient = item.ingredientesBase.find(ing => ing.nombre === ingName); if (ingredient) { ingredient.removed = !ingredient.removed; element.classList.toggle('removed', ingredient.removed); } }
+    function calcularPrecioItem(item) { let precioUnitario = item.precioBase; if (item.extras && item.extras.length > 0) { const precioExtras = item.extras.reduce((acc, extra) => acc + extra.precio, 0); precioUnitario += precioExtras; } return precioUnitario * item.cantidad; }
     function mostrarModalExtras(itemId) {
-        currentEditingItemId = itemId;
-        const item = pedido[itemId];
-
-        document.getElementById('modal-product-name').textContent = `Extras para: ${item.nombre}`;
-        const extrasContainer = document.getElementById('extras-list-container');
-        extrasContainer.innerHTML = '';
-
-        ingredientesExtra.forEach(extra => {
-            const isSelected = item.extras.some(e => e.id === extra.id);
-
-            const optionDiv = document.createElement('div');
-            optionDiv.className = `extra-option ${isSelected ? 'selected' : ''}`;
-            optionDiv.setAttribute('data-extra-id', extra.id);
-            optionDiv.setAttribute('onclick', `toggleExtraModal(this, ${extra.id})`);
-
-            optionDiv.innerHTML = `
-                <span class="extra-info">${extra.nombre}</span>
-                <span class="extra-price">+ S/ ${extra.precio.toFixed(2)}</span>
-            `;
-            extrasContainer.appendChild(optionDiv);
-        });
-
+        currentEditingItemId = itemId; const item = pedido[itemId]; document.getElementById('modal-product-name').textContent = `Extras para: ${item.nombre}`; const extrasContainer = document.getElementById('extras-list-container'); extrasContainer.innerHTML = '';
+        if (ingredientesExtra.length === 0) { extrasContainer.innerHTML = '<p style="text-align:center; color:#888;">No hay extras disponibles.</p>'; } else {
+            ingredientesExtra.forEach(extra => {
+                const isSelected = item.extras.some(e => e.id === extra.id);
+                const optionDiv = document.createElement('div');
+                optionDiv.className = `extra-option ${isSelected ? 'selected' : ''}`;
+                optionDiv.setAttribute('data-extra-id', extra.id);
+                optionDiv.setAttribute('onclick', `toggleExtraModal(this, ${extra.id})`);
+                optionDiv.innerHTML = `<span class="extra-info">${extra.nombre}</span><span class="extra-price">+ S/ ${parseFloat(extra.precio).toFixed(2)}</span>`;
+                extrasContainer.appendChild(optionDiv);
+            });
+        }
         document.getElementById('extras-modal').style.display = 'flex';
     }
-
-    function cerrarModalExtras() {
-        document.getElementById('extras-modal').style.display = 'none';
-        currentEditingItemId = null;
-    }
-
-    function toggleExtraModal(element) {
-        element.classList.toggle('selected');
-    }
-
+    function cerrarModalExtras() { document.getElementById('extras-modal').style.display = 'none'; currentEditingItemId = null; }
+    function toggleExtraModal(element) { element.classList.toggle('selected'); }
     function guardarExtrasModal() {
-        if (!currentEditingItemId) {
-            cerrarModalExtras();
-            return;
-        }
-
-        const item = pedido[currentEditingItemId];
-        item.extras = [];
-
+        if (!currentEditingItemId) { cerrarModalExtras(); return; }
+        const item = pedido[currentEditingItemId]; item.extras = [];
         const selectedElements = document.querySelectorAll('#extras-list-container .extra-option.selected');
-
-        selectedElements.forEach(el => {
-            const extraId = parseInt(el.getAttribute('data-extra-id'));
-            const extraData = ingredientesExtra.find(e => e.id === extraId);
-
-            if (extraData) {
-                item.extras.push(extraData);
-            }
-        });
-
-        actualizarTicket();
-        cerrarModalExtras();
+        selectedElements.forEach(el => { const extraId = parseInt(el.getAttribute('data-extra-id')); const extraData = ingredientesExtra.find(e => e.id === extraId); if (extraData) { item.extras.push(extraData); } });
+        actualizarTicket(); cerrarModalExtras();
     }
 </script>
 </body>

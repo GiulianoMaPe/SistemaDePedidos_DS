@@ -4,116 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administrar Menú e Insumos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body, html {
-            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5; /* Igual a admin_personal */
-        }
-
-        /* Alertas */
-        .alert-container { padding: 20px 20px 0; max-width: 1200px; margin: 0 auto; }
-        .alert { padding: 15px; border-radius: 6px; margin-bottom: 10px; color: white; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .alert-success { background-color: #d4edda; color: #155724; } /* Estilo success de admin_personal */
-        .alert-error { background-color: #f8d7da; color: #721c24; } /* Estilo error de admin_personal */
-        .alert-warning { background-color: #fff3cd; color: #856404; }
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; }
 
         /* Cabecera */
-        .nav-header {
-            background-color: #1e293b;
-            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        .nav-header h2 { margin: 0; font-size: 1.5em; }
-
-        .btn-nav {
-            background-color: rgba(255,255,255,0.2); color: white; text-decoration: none;
-            padding: 8px 15px; border-radius: 5px; font-size: 0.9em; transition: background 0.3s;
-            margin-left: 10px;
-        }
+        .nav-header { background-color: #1e293b; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .nav-header h2 { margin: 0; font-size: 1.5em; display: flex; align-items: center; gap: 10px; }
+        .btn-nav { background-color: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-size: 0.9em; transition: background 0.3s; margin-left: 10px; display: inline-flex; align-items: center; gap: 8px; }
         .btn-nav:hover { background-color: rgba(255,255,255,0.3); }
 
         /* Contenedor */
         .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
-
-        .card {
-            background: white; border-radius: 8px; padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Sombra ajustada a admin_personal */
-        }
-
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .section-header h3 { margin: 0; color: #333; }
 
-        /* Botones de Acción Principal (Agregar) - Estilo admin_personal */
-        .btn-add {
-            background-color: #28a745; /* Verde */
-            color: white; border: none;
-            padding: 10px 16px; border-radius: 5px; cursor: pointer;
-            font-size: 0.95em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
-        }
+        /* Botones */
+        .btn-add { background-color: #28a745; color: white; border: none; padding: 10px 16px; border-radius: 5px; cursor: pointer; font-size: 0.95em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.2s; display: inline-flex; align-items: center; gap: 8px; }
         .btn-add:hover { background-color: #218838; transform: scale(1.02); }
 
-        /* Botones pequeños de tabla */
-        .btn-icon { background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 5px; border-radius: 4px; }
-        .btn-edit { color: #007bff; } /* Azul Bootstrap */
+        .btn-icon { background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 8px; border-radius: 4px; transition: 0.2s; }
+        .btn-edit { color: #007bff; }
         .btn-edit:hover { background-color: #e2e6ea; }
-        .btn-delete { color: #dc3545; } /* Rojo Bootstrap */
+        .btn-delete { color: #dc3545; }
         .btn-delete:hover { background-color: #f8d7da; }
 
-        /* Tablas - Estilo admin_personal */
+        .btn-submit { width: 100%; padding: 12px; background-color: #334155; color: white; border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; font-weight: bold; transition: background 0.3s; display: inline-flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-submit:hover { background-color: #1e293b; }
+
+        /* Tablas */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.95em; }
         th { background-color: #eee; color: #555; font-weight: bold; }
         tr:hover { background-color: #f9f9f9; }
-
-        .tag-insumo { background-color: #e2e6ea; color: #555; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; margin-right: 4px; display: inline-block; margin-bottom: 2px; border: 1px solid #ddd;}
+        .tag-insumo { background-color: #e2e6ea; color: #555; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; margin-right: 4px; display: inline-block; margin-bottom: 2px; border: 1px solid #ddd; }
 
         /* Modales */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 25px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-
-        /* Formulario */
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
 
-        /* Botón Submit del Modal - Estilo admin_personal */
-        .btn-submit {
-            width: 100%; padding: 12px; background-color: #334155; /* Azul Oscuro */
-            color: white; border: none; border-radius: 5px;
-            font-size: 1.1em; cursor: pointer; font-weight: bold;
-            transition: background 0.3s;
-        }
-        .btn-submit:hover { background-color: #1e293b; }
-
-        /* Grid de Insumos */
-        .insumos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; max-height: 250px; overflow-y: auto; }
-        .checkbox-item { display: flex; align-items: center; justify-content: flex-start; background-color: white; border: 1px solid #cbd5e1; padding: 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; font-size: 0.95em; color: #334155; user-select: none;width: 100%; box-sizing: border-box; }
+        /* Grid Insumos Mejorado */
+        .insumos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; max-height: 200px; overflow-y: auto; }
+        .checkbox-item { display: flex; align-items: center; justify-content: flex-start; background-color: white; border: 1px solid #cbd5e1; padding: 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; font-size: 0.95em; color: #334155; user-select: none; width: 100%; box-sizing: border-box; }
         .checkbox-item:hover { background-color: #eff6ff; border-color: #3b82f6; }
         .checkbox-item input[type="checkbox"] { margin-right: 12px; width: 18px; height: 18px; accent-color: #2563eb; cursor: pointer; flex-shrink: 0; }
 
         .empty-state { text-align: center; padding: 30px; color: #888; }
+        .close-icon { background: none; border: none; font-size: 1.5em; color: #999; cursor: pointer; }
+        .close-icon:hover { color: #333; }
     </style>
 </head>
 <body>
 
     <div class="nav-header">
-        <h2>🍔 Administración de Menú</h2>
+        <h2><i class="fa-solid fa-burger"></i> Administración de Menú</h2>
         <div>
-            <a href="{% url 'panel-pedidos' %}" class="btn-nav">📋 Pedidos</a>
-            <a href="{% url 'admin-personal' %}" class="btn-nav">👤 Personal</a>
-            <a href="{% url 'inicio' %}" class="btn-nav" style="background-color: #dc2626; margin-left: 10px;">🚪 Salir</a>
+            <a href="{% url 'panel-pedidos' %}" class="btn-nav"><i class="fa-solid fa-clipboard-list"></i> Pedidos</a>
+            <a href="{% url 'admin-personal' %}" class="btn-nav"><i class="fa-solid fa-users"></i> Personal</a>
+            <a href="{% url 'inicio' %}" class="btn-nav" style="background-color: #dc2626; margin-left: 10px;">
+                <i class="fa-solid fa-door-open"></i> Salir
+            </a>
         </div>
-    </div>
-
-    <div class="alert-container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert {% if message.tags == 'error' %}alert-error{% elif message.tags == 'warning' %}alert-warning{% else %}alert-success{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
     </div>
 
     <div class="container">
@@ -121,7 +76,9 @@
         <div class="card">
             <div class="section-header">
                 <h3>Productos del Menú</h3>
-                <button class="btn-add" onclick="abrirModal('modalProducto')">+ Nuevo Producto</button>
+                <button class="btn-add" onclick="abrirModal('modalProducto')">
+                    <i class="fa-solid fa-plus"></i> Nuevo Producto
+                </button>
             </div>
             <table>
                 <thead>
@@ -148,7 +105,21 @@
                             {% endfor %}
                         </td>
                         <td style="text-align: right;">
-                            <a href="{% url 'eliminar-producto' producto.id %}" class="btn-icon btn-delete" onclick="return confirm('¿Eliminar producto?');">🗑</a>
+                            <button class="btn-icon btn-edit"
+                                onclick="abrirModalEditarProducto(
+                                    '{{ producto.id }}',
+                                    '{{ producto.nombre }}',
+                                    '{{ producto.precio }}',
+                                    '{{ producto.categoria }}',
+                                    '{{ producto.descripcion|escapejs }}',
+                                    [{% for i in producto.insumos.all %}{{ i.id }}{% if not forloop.last %},{% endif %}{% endfor %}]
+                                )">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+
+                            <a href="{% url 'eliminar-producto' producto.id %}" class="btn-icon btn-delete" onclick="return confirm('¿Eliminar producto?');">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
                         </td>
                     </tr>
                     {% empty %}
@@ -161,12 +132,15 @@
         <div class="card">
             <div class="section-header">
                 <h3>Almacén de Insumos</h3>
-                <button class="btn-add" onclick="abrirModal('modalInsumo')">+ Insumo</button>
+                <button class="btn-add" onclick="abrirModal('modalInsumo')">
+                    <i class="fa-solid fa-plus"></i> Insumo
+                </button>
             </div>
             <table>
                 <thead>
                     <tr>
                         <th>Insumo</th>
+                        <th>Precio Extra</th>
                         <th>Stock</th>
                         <th>Acciones</th>
                     </tr>
@@ -175,29 +149,31 @@
                     {% for insumo in insumos %}
                     <tr>
                         <td>{{ insumo.nombre }}</td>
+                        <td style="color: #28a745; font-weight: bold;">S/ {{ insumo.precio }}</td>
                         <td><strong>{{ insumo.stock }}</strong></td>
                         <td style="text-align: right;">
                             <button class="btn-icon btn-edit"
-                                onclick="abrirModalEditar('{{ insumo.id }}', '{{ insumo.nombre }}', '{{ insumo.stock }}')">
-                                ✏️
+                                onclick="abrirModalEditar('{{ insumo.id }}', '{{ insumo.nombre }}', '{{ insumo.stock }}', '{{ insumo.precio }}')">
+                                <i class="fa-solid fa-pen"></i>
                             </button>
-                            <a href="{% url 'eliminar-insumo' insumo.id %}" class="btn-icon btn-delete" onclick="return confirm('¿Eliminar insumo?');">🗑</a>
+                            <a href="{% url 'eliminar-insumo' insumo.id %}" class="btn-icon btn-delete" onclick="return confirm('¿Eliminar insumo?');">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="3" class="empty-state">Lista vacía.</td></tr>
+                    <tr><td colspan="4" class="empty-state">Lista vacía.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-
     </div>
 
     <div id="modalProducto" class="modal-overlay">
         <div class="modal-content">
             <div class="section-header" style="border:none;">
                 <h3>Registrar Producto</h3>
-                <button onclick="cerrarModal('modalProducto')" style="background:none;border:none;font-size:1.5em;cursor:pointer;color:#999;">&times;</button>
+                <button onclick="cerrarModal('modalProducto')" class="close-icon"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form action="{% url 'agregar-producto' %}" method="POST">
                 {% csrf_token %}
@@ -219,7 +195,6 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="form-group">
                     <label>Seleccionar Insumos:</label>
                     <div class="insumos-grid">
@@ -233,12 +208,61 @@
                         {% endfor %}
                     </div>
                 </div>
-
                 <div class="form-group">
                     <label>Descripción:</label>
                     <textarea name="descripcion" rows="2"></textarea>
                 </div>
-                <button type="submit" class="btn-submit">Guardar Producto</button>
+                <button type="submit" class="btn-submit"><i class="fa-solid fa-save"></i> Guardar Producto</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalEditarProducto" class="modal-overlay">
+        <div class="modal-content">
+            <div class="section-header" style="border:none;">
+                <h3>Editar Producto</h3>
+                <button onclick="cerrarModal('modalEditarProducto')" class="close-icon"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form action="{% url 'editar-producto' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="producto_id" id="edit_prod_id">
+
+                <div class="form-group">
+                    <label>Nombre:</label>
+                    <input type="text" name="nombre" id="edit_prod_nombre" required>
+                </div>
+                <div class="form-group" style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label>Precio (S/):</label>
+                        <input type="number" step="0.10" name="precio" id="edit_prod_precio" required min="0" oninput="validarPositivo(this)">
+                    </div>
+                    <div style="flex:1;">
+                        <label>Categoría:</label>
+                        <select name="categoria" id="edit_prod_categoria" required>
+                            <option value="Hamburguesas">Hamburguesas</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Complementos">Complementos</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Modificar Insumos:</label>
+                    <div class="insumos-grid">
+                        {% for insumo in insumos %}
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="insumos_ids" value="{{ insumo.id }}" id="chk_insumo_{{ insumo.id }}">
+                            {{ insumo.nombre }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Descripción:</label>
+                    <textarea name="descripcion" id="edit_prod_descripcion" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn-submit"><i class="fa-solid fa-sync"></i> Actualizar Producto</button>
             </form>
         </div>
     </div>
@@ -247,7 +271,7 @@
         <div class="modal-content" style="max-width: 350px;">
             <div class="section-header" style="border:none;">
                 <h3>Nuevo Insumo</h3>
-                <button onclick="cerrarModal('modalInsumo')" style="background:none;border:none;font-size:1.5em;cursor:pointer;color:#999;">&times;</button>
+                <button onclick="cerrarModal('modalInsumo')" class="close-icon"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form action="{% url 'agregar-insumo' %}" method="POST">
                 {% csrf_token %}
@@ -256,10 +280,14 @@
                     <input type="text" name="nombre" required placeholder="Ej: Pan de Hamburguesa">
                 </div>
                 <div class="form-group">
+                    <label>Precio Extra (S/):</label>
+                    <input type="number" step="0.10" name="precio" value="0.00" min="0" oninput="validarPositivo(this)" required>
+                </div>
+                <div class="form-group">
                     <label>Stock Inicial:</label>
                     <input type="number" name="stock" value="0" min="0" oninput="validarPositivo(this)" required>
                 </div>
-                <button type="submit" class="btn-submit">Agregar Insumo</button>
+                <button type="submit" class="btn-submit"><i class="fa-solid fa-save"></i> Agregar Insumo</button>
             </form>
         </div>
     </div>
@@ -268,7 +296,7 @@
         <div class="modal-content" style="max-width: 350px;">
             <div class="section-header" style="border:none;">
                 <h3>Editar Insumo</h3>
-                <button onclick="cerrarModal('modalEditarInsumo')" style="background:none;border:none;font-size:1.5em;cursor:pointer;color:#999;">&times;</button>
+                <button onclick="cerrarModal('modalEditarInsumo')" class="close-icon"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form action="{% url 'editar-insumo' %}" method="POST">
                 {% csrf_token %}
@@ -279,10 +307,14 @@
                     <input type="text" name="nombre" id="edit_insumo_nombre" required>
                 </div>
                 <div class="form-group">
+                    <label>Precio Extra (S/):</label>
+                    <input type="number" step="0.10" name="precio" id="edit_insumo_precio" min="0" oninput="validarPositivo(this)" required>
+                </div>
+                <div class="form-group">
                     <label>Stock Actual:</label>
                     <input type="number" name="stock" id="edit_insumo_stock" min="0" oninput="validarPositivo(this)" required>
                 </div>
-                <button type="submit" class="btn-submit">Actualizar</button>
+                <button type="submit" class="btn-submit"><i class="fa-solid fa-sync"></i> Actualizar</button>
             </form>
         </div>
     </div>
@@ -291,21 +323,41 @@
         function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
         function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        function abrirModalEditar(id, nombre, stock) {
+        // Editar Insumo
+        function abrirModalEditar(id, nombre, stock, precio) {
             document.getElementById('edit_insumo_id').value = id;
             document.getElementById('edit_insumo_nombre').value = nombre;
             document.getElementById('edit_insumo_stock').value = stock;
+            document.getElementById('edit_insumo_precio').value = precio;
             abrirModal('modalEditarInsumo');
         }
 
-        function validarPositivo(input) {
-            if (input.value < 0) input.value = 0;
+        // Editar Producto (Lógica para marcar checkboxes)
+        function abrirModalEditarProducto(id, nombre, precio, categoria, descripcion, insumosIds) {
+            document.getElementById('edit_prod_id').value = id;
+            document.getElementById('edit_prod_nombre').value = nombre;
+            document.getElementById('edit_prod_precio').value = precio.replace(',', '.'); // Corrección formato decimal
+            document.getElementById('edit_prod_categoria').value = categoria;
+            document.getElementById('edit_prod_descripcion').value = descripcion;
+
+            // 1. Desmarcar todos primero
+            const checkboxes = document.querySelectorAll('#modalEditarProducto input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+
+            // 2. Marcar los que tiene el producto
+            if (insumosIds && insumosIds.length > 0) {
+                insumosIds.forEach(insumoId => {
+                    const chk = document.getElementById('chk_insumo_' + insumoId);
+                    if (chk) chk.checked = true;
+                });
+            }
+
+            abrirModal('modalEditarProducto');
         }
 
-        window.onclick = function(e) {
-            if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none';
-        }
+        function validarPositivo(input) { if (input.value < 0) input.value = 0; }
+
+        window.onclick = function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; }
     </script>
-
 </body>
 </html>

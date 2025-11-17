@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from productos.models import Producto
+from productos.models import Producto, Insumo
 from django.contrib import messages
 from .models import Pedido, DetallePedido
 import json
-
 
 # HU-01: Registrar nuevo pedido
 def registrar_pedido_vista(request):
@@ -12,34 +11,32 @@ def registrar_pedido_vista(request):
 
         if pedido_data:
             try:
-                # Parsear el JSON del pedido
                 pedido_json = json.loads(pedido_data)
-                cliente = request.POST.get('cliente', 'Cliente Mostrador')
+                cliente = request.POST.get('cliente', 'Cliente General')
 
-                # 1. Calcular el total
+                # 1. Calcular total
                 total = 0
                 for item_id, item in pedido_json.items():
                     precio_base = float(item['precioBase'])
                     cantidad = int(item['cantidad'])
-                    # Sumar precio de extras
                     precio_extras = sum(float(extra['precio']) for extra in item.get('extras', []))
                     subtotal = (precio_base + precio_extras) * cantidad
                     total += subtotal
 
-                # 2. Crear el Pedido Padre
+                # 2. Crear Pedido
                 pedido = Pedido.objects.create(
                     cliente=cliente,
                     total=total,
                     estado='En preparación'
                 )
 
-                # 3. Crear los detalles
+                # 3. Crear Detalles
                 for item_id, item in pedido_json.items():
                     producto_id = item['pId']
                     cantidad = item['cantidad']
 
-                    # PROCESAR EXTRAS: Convertir lista de objetos a string "Queso, Tocino"
-                    lista_extras = [extra['nombre'] for extra in item.get('extras', [])]
+                    # Convertir extras a texto para guardar en BD
+                    lista_extras = [f"{extra['nombre']} (S/{extra['precio']})" for extra in item.get('extras', [])]
                     texto_personalizacion = ", ".join(lista_extras)
 
                     try:
@@ -48,7 +45,7 @@ def registrar_pedido_vista(request):
                             pedido=pedido,
                             producto=producto,
                             cantidad=cantidad,
-                            personalizacion=texto_personalizacion  # ¡Aquí guardamos los datos!
+                            personalizacion=texto_personalizacion
                         )
                     except Producto.DoesNotExist:
                         pass
@@ -61,8 +58,30 @@ def registrar_pedido_vista(request):
         else:
             messages.warning(request, 'El carrito está vacío')
 
-    productos = Producto.objects.all()
-    return render(request, 'pedidos/registrar_pedido.html', {'productos': productos})
+    # GET
+    # 1. Traemos productos con sus insumos base precargados
+    productos_bd = Producto.objects.prefetch_related('insumos').all()
+
+    # 2. Traemos insumos para usarlos como EXTRAS
+    insumos_bd = Insumo.objects.all()
+
+    # Convertimos los insumos a una lista de diccionarios para JS
+    extras_list = []
+    for insumo in insumos_bd:
+        extras_list.append({
+            'id': insumo.id,
+            'nombre': insumo.nombre,
+            'precio': float(insumo.precio)  # Convertir Decimal a float para JSON
+        })
+
+    # Serializamos a JSON para pasarlo al template
+    extras_json = json.dumps(extras_list)
+
+    contexto = {
+        'productos': productos_bd,
+        'extras_json': extras_json
+    }
+    return render(request, 'pedidos/registrar_pedido.html', contexto)
 
 
 # HU-02: Personalizar producto

@@ -1,8 +1,21 @@
 CREATE DATABASE DBCocosB;
+GO
 
 CREATE LOGIN django_user WITH PASSWORD = '123456';
+GO
 
 USE DBCocosB;
 CREATE USER django_user FOR LOGIN django_user;
-
 ALTER ROLE db_owner ADD MEMBER django_user;
+GO
+
+------------------------------------------------------------------------------------------------------------------------
+Exportar datos (en cmd con venv activado):
+------------------------------------------------------------------------------------------------------------------------
+python manage.py dumpdata --exclude auth.permission --exclude contenttypes --exclude sessions --indent 2 > datos_backup.json
+
+------------------------------------------------------------------------------------------------------------------------
+Importar datos (en cmd con venv activado):
+------------------------------------------------------------------------------------------------------------------------
+python manage.py migrate
+python manage.py loaddata datos_backup.json

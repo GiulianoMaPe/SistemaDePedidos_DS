@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,8 +14,25 @@
             justify-content: center;
             align-items: center;
         }
-        h1 { font-size: 4em; margin-bottom: 40px; }
+
+        /* Estilo para el logo */
+        .logo-img {
+            width: 400px;
+            height: auto;
+            margin-bottom: 5px;
+            margin-top: -150px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); /* Sombra */
+        }
+
+        h1 {
+            font-size: 4em;
+            margin-bottom: 50px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
         .botones-container { display: flex; gap: 30px; }
+
         .boton-rol {
             display: block;
             padding: 20px 40px;
@@ -24,19 +42,23 @@
             background-color: #FFFFFF;
             border-radius: 10px;
             font-weight: bold;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
+
         .boton-rol:hover {
             transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
+    <img src="{% static 'Images/logococos.png' %}" alt="Logo Coco's Burger" class="logo-img">
+
     <h1>Bienvenido a Coco's Burger</h1>
+
     <div class="botones-container">
-
         <a href="{% url 'login-cajero' %}" class="boton-rol">Soy Cajero</a>
-
         <a href="{% url 'login-admin' %}" class="boton-rol">Soy Administrador</a>
     </div>
 </body>
