@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Ventas - Coco's Burger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        /* Barra de navegación */
+        .nav-bar {
+            background-color: #722f37;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .nav-bar h1 {
+            color: white;
+            font-size: 1.5em;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .btn-volver {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-volver:hover {
+            background-color: #5a6268;
+        }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* Tarjeta de filtros */
+        .filtros-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .filtros-card h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .filtros-form {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .filtro-grupo {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .filtro-grupo label {
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .filtro-grupo input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .btn-filtrar {
+            padding: 10px 25px;
+            background-color: #722f37;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        .btn-filtrar:hover {
+            background-color: #5a252c;
+        }
+        .btn-limpiar {
+            padding: 10px 25px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .btn-limpiar:hover {
+            background-color: #5a6268;
+        }
+
+        /* Resumen de ventas */
+        .resumen-card {
+            background: linear-gradient(135deg, #722f37 0%, #a04450 100%);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .resumen-item {
+            text-align: center;
+        }
+        .resumen-item h4 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        .resumen-item p {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        /* Tabla de ventas */
+        .ventas-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .ventas-card h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .tabla-ventas {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .tabla-ventas th,
+        .tabla-ventas td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .tabla-ventas th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        .tabla-ventas tr:hover {
+            background-color: #f8f9fa;
+        }
+        .monto {
+            font-weight: bold;
+            color: #28a745;
+        }
+        .btn-detalle {
+            padding: 6px 12px;
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+        .btn-detalle:hover {
+            background-color: #138496;
+        }
+
+        /* Mensaje vacío */
+        .mensaje-vacio {
+            text-align: center;
+            padding: 50px 20px;
+            color: #666;
+        }
+        .mensaje-vacio .icono {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+        .mensaje-vacio p {
+            font-size: 1.2em;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filtros-form {
+                flex-direction: column;
+            }
+            .filtro-grupo {
+                width: 100%;
+            }
+            .filtro-grupo input {
+                width: 100%;
+            }
+            .tabla-ventas {
+                font-size: 0.9em;
+            }
+            .tabla-ventas th,
+            .tabla-ventas td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <div class="nav-bar">
+        <h1>📊 Historial de Ventas</h1>
+        <div class="nav-buttons">
+            <a href="{% url 'admin-productos' %}" class="nav-btn btn-volver">🔙 Volver al Panel</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Filtros -->
+        <div class="filtros-card">
+            <h3>🔍 Filtrar por Fecha</h3>
+            <form method="GET" action="" class="filtros-form">
+                <div class="filtro-grupo">
+                    <label for="fecha_inicio">Fecha Inicio:</label>
+                    <input type="date" name="fecha_inicio" id="fecha_inicio" value="{{ fecha_inicio }}">
+                </div>
+                <div class="filtro-grupo">
+                    <label for="fecha_fin">Fecha Fin:</label>
+                    <input type="date" name="fecha_fin" id="fecha_fin" value="{{ fecha_fin }}">
+                </div>
+                <button type="submit" class="btn-filtrar">Filtrar</button>
+                <a href="{% url 'historial-ventas' %}" class="btn-limpiar">Limpiar</a>
+            </form>
+        </div>
+
+        <!-- Resumen -->
+        <div class="resumen-card">
+            <div class="resumen-item">
+                <h4>Total de Ventas</h4>
+                <p>{{ cantidad_ventas }}</p>
+            </div>
+            <div class="resumen-item">
+                <h4>Ingresos Totales</h4>
+                <p>S/ {{ total_ventas|floatformat:2 }}</p>
+            </div>
+        </div>
+
+        <!-- Lista de ventas -->
+        <div class="ventas-card">
+            <h3>📋 Registro de Ventas</h3>
+
+            {% if ventas %}
+            <table class="tabla-ventas">
+                <thead>
+                    <tr>
+                        <th>N° Venta</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Monto Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in ventas %}
+                    <tr>
+                        <td><strong>#{{ venta.id }}</strong></td>
+                        <td>{{ venta.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>{{ venta.cliente }}</td>
+                        <td class="monto">S/ {{ venta.total|floatformat:2 }}</td>
+                        <td>
+                            <a href="{% url 'detalle-venta' venta.id %}" class="btn-detalle">Ver Detalle</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="mensaje-vacio">
+                <div class="icono">📭</div>
+                <p>No hay registros de ventas disponibles</p>
+                {% if fecha_inicio or fecha_fin %}
+                <p style="font-size: 0.9em; margin-top: 10px; color: #888;">
+                    Intenta con otro rango de fechas
+                </p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

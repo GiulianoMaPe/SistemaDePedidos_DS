@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from productos.models import Producto, Insumo
 from django.contrib import messages
+from productos.models import Producto, Insumo
 from .models import Pedido, DetallePedido
 import json
+
 
 # HU-01: Registrar nuevo pedido
 def registrar_pedido_vista(request):
@@ -35,7 +36,6 @@ def registrar_pedido_vista(request):
                     producto_id = item['pId']
                     cantidad = item['cantidad']
 
-                    # Convertir extras a texto para guardar en BD
                     lista_extras = [f"{extra['nombre']} (S/{extra['precio']})" for extra in item.get('extras', [])]
                     texto_personalizacion = ", ".join(lista_extras)
 
@@ -58,23 +58,17 @@ def registrar_pedido_vista(request):
         else:
             messages.warning(request, 'El carrito está vacío')
 
-    # GET
-    # 1. Traemos productos con sus insumos base precargados
     productos_bd = Producto.objects.prefetch_related('insumos').all()
-
-    # 2. Traemos insumos para usarlos como EXTRAS
     insumos_bd = Insumo.objects.all()
 
-    # Convertimos los insumos a una lista de diccionarios para JS
     extras_list = []
     for insumo in insumos_bd:
         extras_list.append({
             'id': insumo.id,
             'nombre': insumo.nombre,
-            'precio': float(insumo.precio)  # Convertir Decimal a float para JSON
+            'precio': float(insumo.precio)
         })
 
-    # Serializamos a JSON para pasarlo al template
     extras_json = json.dumps(extras_list)
 
     contexto = {
@@ -95,13 +89,10 @@ def personalizar_producto_vista(request, producto_id):
 
 # HU-03: Actualizar estado de un pedido
 def panel_pedidos_vista(request):
-    # Mostrar todos los pedidos excepto los entregados y cancelados
     pedidos_activos = Pedido.objects.exclude(estado__in=['Entregado', 'Cancelado']).order_by('-fecha')
-
     contexto = {
         'pedidos': pedidos_activos
     }
-
     return render(request, 'pedidos/panel_pedidos.html', contexto)
 
 
@@ -110,11 +101,59 @@ def actualizar_estado_vista(request, pedido_id):
 
     if request.method == 'POST':
         nuevo_estado = request.POST.get('estado')
-
-        # Validar que el estado sea válido
         estados_validos = ['En preparación', 'Listo para entregar', 'Entregado', 'Cancelado']
         if nuevo_estado in estados_validos:
             pedido.estado = nuevo_estado
             pedido.save()
 
     return redirect('panel-pedidos')
+
+
+# HU-04: Consultar historial de ventas
+def historial_ventas_vista(request):
+    from datetime import datetime, timedelta
+
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+
+    ventas = Pedido.objects.filter(estado='Entregado').order_by('-fecha')
+
+    if fecha_inicio:
+        try:
+            fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d')
+            ventas = ventas.filter(fecha__gte=fecha_inicio_dt)
+        except ValueError:
+            pass
+
+    if fecha_fin:
+        try:
+            fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d')
+            fecha_fin_dt = fecha_fin_dt + timedelta(days=1)
+            ventas = ventas.filter(fecha__lt=fecha_fin_dt)
+        except ValueError:
+            pass
+
+    total_ventas = sum(venta.total for venta in ventas)
+    cantidad_ventas = ventas.count()
+
+    contexto = {
+        'ventas': ventas,
+        'total_ventas': total_ventas,
+        'cantidad_ventas': cantidad_ventas,
+        'fecha_inicio': fecha_inicio or '',
+        'fecha_fin': fecha_fin or '',
+    }
+
+    return render(request, 'pedidos/historial_ventas.html', contexto)
+
+
+def detalle_venta_vista(request, pedido_id):
+    venta = get_object_or_404(Pedido, id=pedido_id)
+    detalles = venta.detalles.all()
+
+    contexto = {
+        'venta': venta,
+        'detalles': detalles,
+    }
+
+    return render(request, 'pedidos/detalle_venta.html', contexto)

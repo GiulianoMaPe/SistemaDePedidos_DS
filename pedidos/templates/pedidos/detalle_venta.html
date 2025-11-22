@@ -1,0 +1,273 @@
+
+<!DOCTYPE html>
+{% load pedidos_extras %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Venta #{{ venta.id }} - Coco's Burger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        /* Barra de navegación */
+        .nav-bar {
+            background-color: #722f37;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .nav-bar h1 {
+            color: white;
+            font-size: 1.5em;
+        }
+        .btn-volver {
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .btn-volver:hover {
+            background-color: #5a6268;
+        }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* Tarjeta principal */
+        .venta-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Header de la tarjeta */
+        .venta-header {
+            background: linear-gradient(135deg, #722f37 0%, #a04450 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .venta-header h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .venta-header .fecha {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        /* Info del cliente */
+        .info-section {
+            padding: 20px 25px;
+            border-bottom: 1px solid #eee;
+        }
+        .info-section h3 {
+            color: #722f37;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+        .info-label {
+            color: #666;
+        }
+        .info-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Tabla de productos */
+        .productos-section {
+            padding: 20px 25px;
+        }
+        .productos-section h3 {
+            color: #722f37;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .tabla-productos {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .tabla-productos th,
+        .tabla-productos td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .tabla-productos th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: bold;
+        }
+        .personalizacion {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Total */
+        .total-section {
+            background-color: #f8f9fa;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .total-section h3 {
+            color: #333;
+            font-size: 1.3em;
+        }
+        .total-monto {
+            font-size: 2em;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        /* Botón imprimir */
+        .acciones-section {
+            padding: 20px 25px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+        .btn-imprimir {
+            padding: 12px 30px;
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        .btn-imprimir:hover {
+            background-color: #138496;
+        }
+
+        /* Estilos para impresión */
+        @media print {
+            .nav-bar, .btn-volver, .acciones-section {
+                display: none;
+            }
+            body {
+                background: white;
+            }
+            .container {
+                margin: 0;
+                padding: 0;
+            }
+            .venta-card {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <div class="nav-bar">
+        <h1>🧾 Detalle de Venta</h1>
+        <a href="{% url 'historial-ventas' %}" class="btn-volver">🔙 Volver al Historial</a>
+    </div>
+
+    <div class="container">
+        <div class="venta-card">
+            <!-- Header -->
+            <div class="venta-header">
+                <h2>Venta #{{ venta.id }}</h2>
+                <p class="fecha">{{ venta.fecha|date:"d/m/Y - H:i:s" }}</p>
+            </div>
+
+            <!-- Info del cliente -->
+            <div class="info-section">
+                <h3>📋 Información de la Venta</h3>
+                <div class="info-row">
+                    <span class="info-label">Cliente:</span>
+                    <span class="info-value">{{ venta.cliente }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Estado:</span>
+                    <span class="info-value" style="color: #28a745;">{{ venta.estado }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Fecha de Registro:</span>
+                    <span class="info-value">{{ venta.fecha|date:"d/m/Y" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Hora:</span>
+                    <span class="info-value">{{ venta.fecha|time:"H:i:s" }}</span>
+                </div>
+            </div>
+
+            <!-- Productos -->
+            <div class="productos-section">
+                <h3>🍔 Productos</h3>
+                <table class="tabla-productos">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unit.</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detalle in detalles %}
+                        <tr>
+                            <td>
+                                {{ detalle.producto.nombre }}
+                                {% if detalle.personalizacion %}
+                                <div class="personalizacion">
+                                    <strong>Extras:</strong> {{ detalle.personalizacion }}
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>{{ detalle.cantidad }}</td>
+                            <td>S/ {{ detalle.producto.precio|floatformat:2 }}</td>
+                            <td>S/ {{ detalle.producto.precio|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #666;">
+                                No hay detalles disponibles
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Total -->
+            <div class="total-section">
+                <h3>TOTAL PAGADO:</h3>
+                <span class="total-monto">S/ {{ venta.total|floatformat:2 }}</span>
+            </div>
+
+            <!-- Acciones -->
+            <div class="acciones-section">
+                <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir Comprobante</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

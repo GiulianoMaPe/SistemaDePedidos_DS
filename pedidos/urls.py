@@ -9,4 +9,7 @@ urlpatterns = [
     #HU-03
     path('panel/', views.panel_pedidos_vista, name='panel-pedidos'),
     path('actualizar-estado/<int:pedido_id>/', views.actualizar_estado_vista, name='actualizar-estado'),
+    #HU-04: Historial de ventas
+    path('historial/', views.historial_ventas_vista, name='historial-ventas'),
+    path('historial/detalle/<int:pedido_id>/', views.detalle_venta_vista, name='detalle-venta'),
 ]
