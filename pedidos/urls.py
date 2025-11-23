@@ -11,5 +11,11 @@ urlpatterns = [
     path('actualizar-estado/<int:pedido_id>/', views.actualizar_estado_vista, name='actualizar-estado'),
     #HU-04: Historial de ventas
     path('historial/', views.historial_ventas_vista, name='historial-ventas'),
+    # HU-09: Registro de ventas
+    path('exportar-ventas-pdf/', views.exportar_ventas_pdf, name='exportar-ventas-pdf'),
+    path('exportar-ventas-excel/', views.exportar_ventas_excel, name='exportar-ventas-excel'),
     path('historial/detalle/<int:pedido_id>/', views.detalle_venta_vista, name='detalle-venta'),
+    # Panel de administrador
+    path('panel-admin/', views.panel_pedidos_admin_vista, name='panel-pedidos-admin'),
+    path('finalizar-dia/', views.finalizar_dia_vista, name='finalizar-dia'),
 ]

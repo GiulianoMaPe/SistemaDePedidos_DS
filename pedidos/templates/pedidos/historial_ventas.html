@@ -116,6 +116,57 @@
             background-color: #5a6268;
         }
 
+        /* Botones de exportación */
+        .exportar-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+        .btn-exportar {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-pdf {
+            background-color: #8b4049;
+            color: white;
+        }
+        .btn-pdf:hover {
+            background-color: #722f37;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+        .btn-excel {
+            background-color: #4a7c59;
+            color: white;
+        }
+        .btn-excel:hover {
+            background-color: #3d6649;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+        .btn-imprimir {
+            background-color: #5a6c7d;
+            color: white;
+        }
+        .btn-imprimir:hover {
+            background-color: #495663;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+
         /* Resumen de ventas */
         .resumen-card {
             background: linear-gradient(135deg, #722f37 0%, #a04450 100%);
@@ -203,6 +254,49 @@
             font-size: 1.2em;
         }
 
+        /* Mensajes de alerta */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+        }
+        .alert-info {
+            background-color: #d1ecf1;
+            border: 1px solid #17a2b8;
+            color: #0c5460;
+        }
+
+        /* Estilos para impresión */
+        @media print {
+            .nav-bar, .filtros-card, .exportar-buttons, .btn-detalle, .acciones-columna {
+                display: none !important;
+            }
+            body {
+                background-color: white;
+            }
+            .container {
+                max-width: 100%;
+                margin: 0;
+                padding: 20px;
+            }
+            .ventas-card, .resumen-card {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+            .tabla-ventas {
+                width: 100%;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .filtros-form {
@@ -234,10 +328,20 @@
     </div>
 
     <div class="container">
+        <!-- Mensajes del sistema -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <span>⚠️</span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
         <!-- Filtros -->
         <div class="filtros-card">
             <h3>🔍 Filtrar por Fecha</h3>
-            <form method="GET" action="" class="filtros-form">
+            <form method="GET" action="" class="filtros-form" id="filtrosForm">
                 <div class="filtro-grupo">
                     <label for="fecha_inicio">Fecha Inicio:</label>
                     <input type="date" name="fecha_inicio" id="fecha_inicio" value="{{ fecha_inicio }}">
@@ -249,6 +353,23 @@
                 <button type="submit" class="btn-filtrar">Filtrar</button>
                 <a href="{% url 'historial-ventas' %}" class="btn-limpiar">Limpiar</a>
             </form>
+
+            <!-- Botones de exportación -->
+            {% if fecha_inicio or fecha_fin %}
+                {% if ventas %}
+                <div class="exportar-buttons">
+                    <a href="{% url 'exportar-ventas-pdf' %}?fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}" class="btn-exportar btn-pdf">
+                        📄 Descargar PDF
+                    </a>
+                    <a href="{% url 'exportar-ventas-excel' %}?fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}" class="btn-exportar btn-excel">
+                        📊 Descargar Excel
+                    </a>
+                    <button onclick="window.print()" class="btn-exportar btn-imprimir">
+                        🖨️ Imprimir
+                    </button>
+                </div>
+                {% endif %}
+            {% endif %}
         </div>
 
         <!-- Resumen -->
@@ -275,7 +396,7 @@
                         <th>Fecha</th>
                         <th>Cliente</th>
                         <th>Monto Total</th>
-                        <th>Acciones</th>
+                        <th class="acciones-columna">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -285,7 +406,7 @@
                         <td>{{ venta.fecha|date:"d/m/Y H:i" }}</td>
                         <td>{{ venta.cliente }}</td>
                         <td class="monto">S/ {{ venta.total|floatformat:2 }}</td>
-                        <td>
+                        <td class="acciones-columna">
                             <a href="{% url 'detalle-venta' venta.id %}" class="btn-detalle">Ver Detalle</a>
                         </td>
                     </tr>
