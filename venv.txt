@@ -1,7 +1,9 @@
 py -m venv venv
 .\venv\Scripts\activate
 
-pip install django mssql-django djangorestframework pillow pyodbc
+pip install django mssql-django djangorestframework pillow pyodbc reportlab openpyxl
 
 python manage.py makemigrations
 python manage.py migrate
+
+python manage.py runserver

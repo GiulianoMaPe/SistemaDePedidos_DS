@@ -13,13 +13,19 @@ def administrar_productos_vista(request):
     }
     return render(request, 'productos/admin_productos.html', contexto)
 
+
+# productos/views.py
+
 def agregar_producto_vista(request):
     if request.method == 'POST':
         try:
             nombre = request.POST.get('nombre')
-            precio_input = request.POST.get('precio')  # Obtener como string
+            precio_input = request.POST.get('precio')
             categoria = request.POST.get('categoria')
             descripcion = request.POST.get('descripcion')
+
+            # 1. CAPTURAR LA IMAGEN
+            imagen = request.FILES.get('imagen')
 
             try:
                 precio = float(precio_input)
@@ -32,9 +38,10 @@ def agregar_producto_vista(request):
                 nombre=nombre,
                 precio=precio,
                 categoria=categoria,
-                descripcion=descripcion
+                descripcion=descripcion,
+                imagen=imagen  # 2. GUARDAR LA IMAGEN
             )
-            # Asociar insumos seleccionados
+
             insumos_ids = request.POST.getlist('insumos_ids')
             if insumos_ids:
                 insumos_ids = [int(id) for id in insumos_ids]
@@ -47,6 +54,7 @@ def agregar_producto_vista(request):
 
     return redirect('admin-productos')
 
+
 def editar_producto_vista(request):
     if request.method == 'POST':
         producto_id = request.POST.get('producto_id')
@@ -56,6 +64,11 @@ def editar_producto_vista(request):
             producto.nombre = request.POST.get('nombre')
             producto.categoria = request.POST.get('categoria')
             producto.descripcion = request.POST.get('descripcion')
+
+            # 3. ACTUALIZAR IMAGEN SOLO SI SE SUBIÓ UNA NUEVA
+            nueva_imagen = request.FILES.get('imagen')
+            if nueva_imagen:
+                producto.imagen = nueva_imagen
 
             precio_input = request.POST.get('precio')
             try:

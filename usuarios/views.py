@@ -1,29 +1,18 @@
-from django.shortcuts import render, redirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db import IntegrityError
 
-def login_cajero_vista(request):
-    #POST
-    if request.method == 'POST':
-        # ---
-        # HU-06: Iniciar sesión en el sistema
-        # ---
-        return redirect('registrar-pedido')
 
-    #GET
+def login_cajero_vista(request):
+    if request.method == 'POST':
+        return redirect('registrar-pedido')
     return render(request, 'usuarios/login_cajero.html')
 
-def login_admin_vista(request):
-    #POST
-    if request.method == 'POST':
-        # ---
-        # HU-06: Iniciar sesión en el sistema
-        # ---
-        return redirect('admin-productos')
 
-    #GET
+def login_admin_vista(request):
+    if request.method == 'POST':
+        return redirect('admin-productos')
     return render(request, 'usuarios/login_admin.html')
 
 
@@ -31,45 +20,45 @@ def login_admin_vista(request):
 
 def admin_personal_vista(request):
     """
-    (R)ead: Muestra la lista de todo el personal que NO es superusuario (Administrador).
-    Cumple la precondición de estar en la pantalla "Personal".
+    (R)ead: Muestra dos listas separadas: Administradores y Cajeros.
     """
-    # Filtramos para mostrar solo usuarios que no son administradores
-    # Asumimos que los cajeros son "is_superuser=False"
-    cajeros = User.objects.filter(is_superuser=False).order_by('username')
+    # Filtramos por is_superuser para separar roles
+    administradores = User.objects.filter(is_staff=True, is_superuser=True).order_by('username')
+    cajeros = User.objects.filter(is_staff=True, is_superuser=False).order_by('username')
+
     contexto = {
+        'administradores': administradores,
         'cajeros': cajeros
     }
     return render(request, 'usuarios/admin_personal.html', contexto)
 
 
 def agregar_cajero_vista(request):
-    """
-    (C)reate: Procesa el formulario para crear un nuevo cajero.
-    """
     if request.method == 'POST':
         username = request.POST.get('username')
         pass_raw = request.POST.get('password')
         email = request.POST.get('email')
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
+        rol = request.POST.get('rol')
 
-        # Criterio de Aceptación 4: Validar usuario único
         if User.objects.filter(username=username).exists():
             messages.error(request, f"Error: El nombre de usuario '{username}' ya existe.")
             return redirect('admin-personal')
 
         try:
-            # Criterio de Aceptación 1: Crear nuevo cajero
+            es_admin = (rol == 'administrador')
             user = User.objects.create_user(
                 username=username,
                 password=pass_raw,
                 email=email,
                 first_name=first_name,
                 last_name=last_name,
-                is_staff=True  # Le damos acceso al admin, pero no es superusuario
+                is_staff=True,
+                is_superuser=es_admin
             )
-            messages.success(request, f"Cajero '{username}' creado exitosamente.")
+            tipo = "Administrador" if es_admin else "Cajero"
+            messages.success(request, f"{tipo} '{username}' creado exitosamente.")
 
         except IntegrityError:
             messages.error(request, f"Error: El nombre de usuario '{username}' ya existe.")
@@ -80,22 +69,18 @@ def agregar_cajero_vista(request):
 
 
 def modificar_cajero_vista(request, user_id):
-    """
-    (U)pdate: Procesa el formulario para modificar un cajero existente.
-    """
     if request.method == 'POST':
-        # Criterio de Aceptación 2: Seleccionar y modificar
         user = get_object_or_404(User, id=user_id)
 
         username = request.POST.get('username')
         email = request.POST.get('email')
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
-        pass_raw = request.POST.get('password')  # Opcional
+        pass_raw = request.POST.get('password')
+        rol = request.POST.get('rol')
 
-        # Criterio de Aceptación 4: Validar usuario único (excluyendo al usuario actual)
         if User.objects.filter(username=username).exclude(id=user_id).exists():
-            messages.error(request, f"Error: El nombre de usuario '{username}' ya pertenece a otra cuenta.")
+            messages.error(request, f"Error: El usuario '{username}' ya pertenece a otra cuenta.")
             return redirect('admin-personal')
 
         try:
@@ -104,12 +89,14 @@ def modificar_cajero_vista(request, user_id):
             user.first_name = first_name
             user.last_name = last_name
 
-            # Solo actualizar la contraseña si se proporcionó una nueva
+            if rol:
+                user.is_superuser = (rol == 'administrador')
+
             if pass_raw:
                 user.set_password(pass_raw)
 
             user.save()
-            messages.success(request, f"Cajero '{username}' actualizado exitosamente.")
+            messages.success(request, f"Usuario '{username}' actualizado exitosamente.")
 
         except Exception as e:
             messages.error(request, f"Error al actualizar: {str(e)}")
@@ -118,16 +105,16 @@ def modificar_cajero_vista(request, user_id):
 
 
 def eliminar_cajero_vista(request, user_id):
-    """
-    (D)elete: Elimina un cajero de la base de datos.
-    """
-    # Criterio de Aceptación 3: Seleccionar y eliminar
     user = get_object_or_404(User, id=user_id)
+
+    if user.id == request.user.id:
+        messages.error(request, "No puedes eliminar tu propia cuenta mientras estás logueado.")
+        return redirect('admin-personal')
 
     try:
         username_copia = user.username
         user.delete()
-        messages.success(request, f"Cajero '{username_copia}' eliminado permanentemente.")
+        messages.warning(request, f"Usuario '{username_copia}' eliminado permanentemente.")
 
     except Exception as e:
         messages.error(request, f"Error al eliminar: {str(e)}")

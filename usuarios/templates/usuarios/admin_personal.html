@@ -6,27 +6,61 @@
     <title>Administrar Personal - Coco's Burger</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* (Mismos estilos de admin_productos.html para mantener coherencia) */
-        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; }
+        /* Estilos Base Estandarizados */
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; color: #333; }
 
-        .nav-header { background-color: #1e293b; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        /* Layout Fijo */
+        body, html {
+            margin: 0; padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Fijo */
+        .nav-header {
+            background-color: #1e293b;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+            z-index: 100;
+        }
         .nav-header h2 { margin: 0; font-size: 1.5em; display: flex; align-items: center; gap: 10px; }
 
-        .btn-nav { background-color: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-size: 0.9em; transition: background 0.3s; margin-left: 10px; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-nav:hover { background-color: rgba(255,255,255,0.3); }
+        .btn-nav { background-color: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-size: 0.9em; transition: background 0.3s; margin-left: 5px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-nav:hover { background-color: rgba(255,255,255,0.2); }
+        .btn-nav.active { background-color: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.3); }
 
-        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
-        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .header-actions h3 { margin: 0; color: #333; }
+        /* Área de Scroll */
+        .main-content-scroll {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 30px 20px;
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+        .card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .header-actions h3 { margin: 0; color: #333; font-size: 1.3em; }
 
         .btn-add { background-color: #28a745; color: white; border: none; padding: 10px 16px; border-radius: 5px; cursor: pointer; font-size: 0.95em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.2s; display: inline-flex; align-items: center; gap: 8px; }
         .btn-add:hover { background-color: #218838; transform: scale(1.02); }
 
-        .user-table { width: 100%; background: white; border-collapse: collapse; }
+        .user-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .user-table th, .user-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.95em; }
-        .user-table th { background-color: #eee; color: #555; font-weight: bold; }
-        .user-table tr:hover { background-color: #f9f9f9; }
+        .user-table th { background-color: #f1f5f9; color: #475569; font-weight: 600; }
+        .user-table tr:hover { background-color: #f8fafc; }
+
+        /* Badges de Rol */
+        .role-badge { padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 0.85em; display: inline-block; }
+        .role-admin { background-color: #e0e7ff; color: #4338ca; }
+        .role-cajero { background-color: #dcfce7; color: #15803d; }
 
         .btn-icon { background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 8px; border-radius: 4px; transition: 0.2s; }
         .btn-edit { color: #007bff; }
@@ -37,23 +71,22 @@
         .btn-submit { width: 100%; padding: 12px; background-color: #334155; color: white; border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; font-weight: bold; transition: background 0.3s; display: inline-flex; justify-content: center; align-items: center; gap: 8px; }
         .btn-submit:hover { background-color: #1e293b; }
 
-        .empty-state { text-align: center; padding: 40px; color: #888; }
+        .empty-state { text-align: center; padding: 40px; color: #94a3b8; }
 
         /* Modales */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 90%; max-width: 450px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 90%; max-width: 450px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.2s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .modal-header h3 { margin: 0; color: #333; }
         .close-icon { background: none; border: none; font-size: 1.5em; cursor: pointer; color: #999; }
         .close-icon:hover { color: #333; }
 
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-
-        .alert { padding: 15px; border-radius: 6px; margin-bottom: 20px; color: white; font-weight: 600; display:flex; align-items:center; gap:10px; }
-        .success { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: #721c24; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 1em; }
+        .form-group select:focus, .form-group input:focus { outline: none; border-color: #334155; }
     </style>
 </head>
 <body>
@@ -61,86 +94,139 @@
     <div class="nav-header">
         <h2><i class="fa-solid fa-users-gear"></i> Administración de Personal</h2>
         <div>
-            <a href="{% url 'panel-pedidos' %}" class="btn-nav"><i class="fa-solid fa-clipboard-list"></i> Pedidos</a>
+            <a href="{% url 'panel-pedidos-admin' %}" class="btn-nav"><i class="fa-solid fa-clipboard-list"></i> Pedidos</a>
             <a href="{% url 'admin-productos' %}" class="btn-nav"><i class="fa-solid fa-burger"></i> Menú</a>
+            <a href="{% url 'admin-personal' %}" class="btn-nav active"><i class="fa-solid fa-users"></i> Personal</a>
+            <a href="{% url 'historial-ventas' %}" class="btn-nav"><i class="fa-solid fa-chart-pie"></i> Historial</a>
             <a href="{% url 'inicio' %}" class="btn-nav" style="background-color: #dc2626; margin-left: 10px;">
                 <i class="fa-solid fa-door-open"></i> Salir
             </a>
         </div>
     </div>
 
-    <div class="container">
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert {{ message.tags }}">
-                <i class="fa-solid {% if message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-check{% endif %}"></i>
-                {{ message }}
-            </div>
-            {% endfor %}
-        {% endif %}
+    <div class="main-content-scroll">
+        <div class="container">
 
-        <div class="card">
-            <div class="header-actions">
-                <h3>Personal (Cajeros)</h3>
-                <button class="btn-add" onclick="abrirModalAgregar()">
-                    <i class="fa-solid fa-user-plus"></i> Nuevo Cajero
-                </button>
+            <div class="card">
+                <div class="header-actions">
+                    <h3><i class="fa-solid fa-user-shield"></i> Administradores</h3>
+                    <button class="btn-add" onclick="abrirModalAgregar('administrador')">
+                        <i class="fa-solid fa-plus"></i> Nuevo Admin
+                    </button>
+                </div>
+
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Rol</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for admin in administradores %}
+                        <tr>
+                            <td><strong>{{ admin.username }}</strong></td>
+                            <td><span class="role-badge role-admin">Administrador</span></td>
+                            <td>{{ admin.first_name }} {{ admin.last_name }}</td>
+                            <td>{{ admin.email|default:"-" }}</td>
+                            <td>
+                                <button class="btn-icon btn-edit"
+                                        onclick="abrirModalModificar(
+                                            '{{ admin.id }}',
+                                            '{{ admin.username }}',
+                                            '{{ admin.first_name }}',
+                                            '{{ admin.last_name }}',
+                                            '{{ admin.email }}',
+                                            'administrador'
+                                        )">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <a href="{% url 'eliminar-cajero' admin.id %}"
+                                   class="btn-icon btn-delete"
+                                   onclick="return confirm('¿Eliminar administrador {{ admin.username }}?');">
+                                   <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="empty-state">No hay administradores registrados.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
-            <table class="user-table">
-                <thead>
-                    <tr>
-                        <th>Usuario</th>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Email</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for cajero in cajeros %}
-                    <tr>
-                        <td><strong>{{ cajero.username }}</strong></td>
-                        <td>{{ cajero.first_name|default:"-" }}</td>
-                        <td>{{ cajero.last_name|default:"-" }}</td>
-                        <td>{{ cajero.email|default:"-" }}</td>
-                        <td>
-                            <button class="btn-icon btn-edit"
-                                    onclick="abrirModalModificar(
-                                        '{{ cajero.id }}',
-                                        '{{ cajero.username }}',
-                                        '{{ cajero.first_name }}',
-                                        '{{ cajero.last_name }}',
-                                        '{{ cajero.email }}'
-                                    )">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <a href="{% url 'eliminar-cajero' cajero.id %}"
-                               class="btn-icon btn-delete"
-                               onclick="return confirm('¿Estás seguro de eliminar a {{ cajero.username }}?');">
-                               <i class="fa-solid fa-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="empty-state">No hay cajeros registrados.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="card">
+                <div class="header-actions">
+                    <h3><i class="fa-solid fa-cash-register"></i> Cajeros</h3>
+                    <button class="btn-add" onclick="abrirModalAgregar('cajero')">
+                        <i class="fa-solid fa-plus"></i> Nuevo Cajero
+                    </button>
+                </div>
+
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Rol</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cajero in cajeros %}
+                        <tr>
+                            <td><strong>{{ cajero.username }}</strong></td>
+                            <td><span class="role-badge role-cajero">Cajero</span></td>
+                            <td>{{ cajero.first_name }} {{ cajero.last_name }}</td>
+                            <td>{{ cajero.email|default:"-" }}</td>
+                            <td>
+                                <button class="btn-icon btn-edit"
+                                        onclick="abrirModalModificar(
+                                            '{{ cajero.id }}',
+                                            '{{ cajero.username }}',
+                                            '{{ cajero.first_name }}',
+                                            '{{ cajero.last_name }}',
+                                            '{{ cajero.email }}',
+                                            'cajero'
+                                        )">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <a href="{% url 'eliminar-cajero' cajero.id %}"
+                                   class="btn-icon btn-delete"
+                                   onclick="return confirm('¿Eliminar cajero {{ cajero.username }}?');">
+                                   <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="empty-state">No hay cajeros registrados.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <div id="modalAgregar" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Agregar Nuevo Cajero</h3>
-                <button class="close-icon" onclick="cerrarModal('modalAgregar')"><i class="fa-solid fa-xmark"></i></button>
+                <h3>Nuevo Usuario</h3>
+                <button class="close-icon" onclick="cerrarModal('modalAgregar')"><i class="fa-solid fa-times"></i></button>
             </div>
 
             <form action="{% url 'agregar-cajero' %}" method="POST">
                 {% csrf_token %}
+                <div class="form-group">
+                    <label>Rol de Usuario:</label>
+                    <select name="rol" id="add_rol">
+                        <option value="cajero">Cajero</option>
+                        <option value="administrador">Administrador</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label>Usuario:</label>
                     <input type="text" name="username" required placeholder="ej: juan.perez">
@@ -161,7 +247,7 @@
                     <label>Contraseña:</label>
                     <input type="password" name="password" required>
                 </div>
-                <button type="submit" class="btn-submit"><i class="fa-solid fa-save"></i> Guardar Cajero</button>
+                <button type="submit" class="btn-submit">Guardar Usuario</button>
             </form>
         </div>
     </div>
@@ -169,12 +255,19 @@
     <div id="modalModificar" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Modificar Cajero</h3>
-                <button class="close-icon" onclick="cerrarModal('modalModificar')"><i class="fa-solid fa-xmark"></i></button>
+                <h3>Modificar Usuario</h3>
+                <button class="close-icon" onclick="cerrarModal('modalModificar')"><i class="fa-solid fa-times"></i></button>
             </div>
 
             <form id="formModificar" method="POST">
                 {% csrf_token %}
+                <div class="form-group">
+                    <label>Rol de Usuario:</label>
+                    <select name="rol" id="edit_rol">
+                        <option value="cajero">Cajero</option>
+                        <option value="administrador">Administrador</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label>Usuario:</label>
                     <input type="text" id="edit_username" name="username" required>
@@ -195,20 +288,27 @@
                     <label>Nueva Contraseña (Dejar en blanco para no cambiar):</label>
                     <input type="password" name="password" placeholder="••••••••">
                 </div>
-                <button type="submit" class="btn-submit"><i class="fa-solid fa-sync"></i> Actualizar Cambios</button>
+                <button type="submit" class="btn-submit">Actualizar Cambios</button>
             </form>
         </div>
     </div>
 
     <script>
         function cerrarModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-        function abrirModalAgregar() { document.getElementById('modalAgregar').style.display = 'flex'; }
 
-        function abrirModalModificar(id, username, first_name, last_name, email) {
+        function abrirModalAgregar(rolPreseleccionado) {
+            if(rolPreseleccionado) {
+                document.getElementById('add_rol').value = rolPreseleccionado;
+            }
+            document.getElementById('modalAgregar').style.display = 'flex';
+        }
+
+        function abrirModalModificar(id, username, first_name, last_name, email, rol) {
             document.getElementById('edit_username').value = username;
             document.getElementById('edit_first_name').value = first_name;
             document.getElementById('edit_last_name').value = last_name;
             document.getElementById('edit_email').value = email;
+            document.getElementById('edit_rol').value = rol;
 
             let urlTemplate = "{% url 'modificar-cajero' 0 %}";
             document.getElementById('formModificar').action = urlTemplate.replace('0', id);

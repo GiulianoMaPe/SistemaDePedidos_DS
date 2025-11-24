@@ -6,300 +6,250 @@
     <title>Panel de Pedidos - Administrador</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Layout Fijo: Header estático + Contenido con Scroll */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f7fa; }
 
-        /* Header */
-        .nav-header { background: linear-gradient(135deg, #722f37 0%, #8b3a44 100%); padding: 20px 30px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .nav-header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .nav-header h1 { font-size: 1.8em; display: flex; align-items: center; gap: 12px; }
-        .nav-header .fecha-dia { font-size: 0.5em; opacity: 0.9; margin-left: 15px; }
-        .nav-links { display: flex; gap: 10px; align-items: center; }
-        .btn-nav { background-color: rgba(255,255,255,0.15); color: white; text-decoration: none; padding: 10px 18px; border-radius: 8px; font-size: 0.95em; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
-        .btn-nav:hover { background-color: rgba(255,255,255,0.25); transform: translateY(-2px); }
-        .btn-nav.salir { background-color: #dc2626; border-color: #dc2626; }
-        .btn-nav.salir:hover { background-color: #b91c1c; }
+        body, html {
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-        /* Container */
-        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
+        /* Header Fijo */
+        .nav-header {
+            background-color: #1e293b;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+            z-index: 100;
+        }
+        .nav-header h2 { margin: 0; font-size: 1.5em; display: flex; align-items: center; gap: 10px; }
+        .nav-header .fecha-dia { font-size: 0.5em; opacity: 0.7; margin-left: 15px; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; }
 
-        /* Estadísticas */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 20px; transition: transform 0.2s; }
-        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
-        .stat-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.8em; }
-        .stat-icon.blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
-        .stat-icon.green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
-        .stat-icon.yellow { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
-        .stat-icon.red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
-        .stat-icon.purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; }
-        .stat-info h3 { font-size: 2em; color: #1e293b; margin-bottom: 5px; }
-        .stat-info p { color: #64748b; font-size: 0.95em; }
+        /* Botones Nav */
+        .btn-nav { background-color: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-size: 0.9em; transition: background 0.3s; margin-left: 5px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-nav:hover { background-color: rgba(255,255,255,0.2); }
+        .btn-nav.active { background-color: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.3); }
+
+        /* Área de Scroll */
+        .main-content-scroll {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 30px 20px;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        /* Cards */
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 25px; }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 15px; transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); }
+        .stat-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5em; color: white; }
+
+        .bg-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .bg-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .bg-yellow { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .bg-purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+
+        .stat-info h3 { font-size: 1.8em; color: #1e293b; margin: 0; line-height: 1.2; }
+        .stat-info p { color: #64748b; font-size: 0.85em; margin: 0; }
 
         /* Filtros */
-        .filters-card { background: white; padding: 20px 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 25px; }
         .filters-form { display: flex; gap: 15px; align-items: end; flex-wrap: wrap; }
         .filter-group { flex: 1; min-width: 200px; }
-        .filter-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #475569; font-size: 0.9em; }
-        .filter-group select { width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95em; transition: border-color 0.3s; }
-        .filter-group select:focus { outline: none; border-color: #722f37; }
-        .btn-filter { padding: 11px 20px; background: linear-gradient(135deg, #722f37 0%, #8b3a44 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
-        .btn-filter:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(114, 47, 55, 0.3); }
-        .btn-clear { padding: 11px 20px; background: #64748b; color: white; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s; }
-        .btn-clear:hover { background: #475569; }
+        .filter-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; font-size: 0.9em; }
+        .filter-group select { width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 5px; }
+        .btn-filter { padding: 9px 20px; background-color: #334155; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; transition: background 0.3s; }
+        .btn-filter:hover { background-color: #1e293b; }
+        .btn-clear { padding: 9px 20px; background: #94a3b8; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9em; }
+        .btn-clear:hover { background: #64748b; }
 
         /* Tabla */
-        .table-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
-        .table-header { padding: 20px 25px; border-bottom: 2px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
-        .table-header h2 { color: #1e293b; display: flex; align-items: center; gap: 10px; }
-        .btn-finalizar-tabla { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s; }
-        .btn-finalizar-tabla:hover { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); transform: translateY(-2px); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .table-header h3 { margin: 0; color: #333; font-size: 1.3em; }
+        .btn-finalizar-tabla { background: #f59e0b; color: white; padding: 8px 16px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s; font-size: 0.9em; }
+        .btn-finalizar-tabla:hover { background: #d97706; }
+
         table { width: 100%; border-collapse: collapse; }
-        thead { background: #f8fafc; }
-        th { padding: 15px 20px; text-align: left; font-weight: 600; color: #475569; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.5px; }
-        td { padding: 18px 20px; border-bottom: 1px solid #f1f5f9; font-size: 0.95em; color: #334155; }
-        tbody tr { transition: background-color 0.2s; }
+        th { padding: 12px 15px; text-align: left; font-weight: 600; color: #555; background-color: #f1f5f9; font-size: 0.9em; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.95em; color: #334155; }
         tbody tr:hover { background-color: #f8fafc; }
 
-        /* Estados */
-        .estado-badge { padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 0.85em; display: inline-flex; align-items: center; gap: 6px; }
-        .estado-preparacion { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-        .estado-listo { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
-        .estado-entregado { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-        .estado-cancelado { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .estado-badge { padding: 4px 10px; border-radius: 12px; font-weight: 600; font-size: 0.8em; display: inline-flex; align-items: center; gap: 5px; }
+        .estado-preparacion { background-color: #fef3c7; color: #92400e; }
+        .estado-listo { background-color: #dbeafe; color: #1e40af; }
+        .estado-entregado { background-color: #d1fae5; color: #065f46; }
+        .estado-cancelado { background-color: #fee2e2; color: #991b1b; }
 
-        /* Botones de acción */
-        .btn-acciones { display: flex; gap: 8px; }
-        .btn-cambiar { background: #10b981; color: white; padding: 8px 14px; border: none; border-radius: 6px; font-size: 0.85em; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; cursor: pointer; }
-        .btn-cambiar:hover { background: #059669; transform: translateY(-2px); }
+        .btn-cambiar { background: #10b981; color: white; padding: 6px 12px; border: none; border-radius: 4px; font-size: 0.85em; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; transition: background 0.2s; }
+        .btn-cambiar:hover { background: #059669; }
 
-        /* Empty State */
-        .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
-        .empty-state i { font-size: 4em; margin-bottom: 20px; display: block; opacity: 0.5; }
+        /* Modales */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.2s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { margin: 0; font-size: 1.2em; color: #333; }
+        .btn-close { background: none; border: none; font-size: 1.2em; cursor: pointer; color: #999; }
+        .btn-close:hover { color: #333; }
+        .modal-body { padding: 20px; }
 
-        /* Modal */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-        .modal-content { background: white; width: 90%; max-width: 450px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalSlideIn 0.3s ease; }
-        @keyframes modalSlideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-header { padding: 25px 30px; border-bottom: 2px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #722f37 0%, #8b3a44 100%); color: white; border-radius: 16px 16px 0 0; }
-        .modal-header h2 { margin: 0; font-size: 1.5em; display: flex; align-items: center; gap: 10px; }
-        .btn-close { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 1.5em; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
-        .btn-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
-        .modal-body { padding: 30px; }
-
-        /* Modal de confirmación */
-        .modal-confirm .icon-warning { font-size: 4em; color: #f59e0b; margin-bottom: 20px; text-align: center; }
-        .modal-confirm p { font-size: 1.1em; color: #475569; margin-bottom: 25px; line-height: 1.6; text-align: center; }
-        .modal-confirm .btns-confirm { display: flex; gap: 15px; justify-content: center; }
-        .btn-confirm-action { padding: 12px 30px; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-        .btn-confirm-si { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
-        .btn-confirm-si:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
+        .btns-confirm { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn-confirm-action { padding: 8px 20px; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; }
+        .btn-confirm-si { background: #f59e0b; color: white; }
         .btn-confirm-no { background: #e2e8f0; color: #475569; }
-        .btn-confirm-no:hover { background: #cbd5e1; }
 
-        /* Modal cambiar estado */
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #475569; }
-        .form-group select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em; }
-        .form-group select:focus { outline: none; border-color: #722f37; }
-        .btn-submit { width: 100%; padding: 12px; background: linear-gradient(135deg, #722f37 0%, #8b3a44 100%); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(114, 47, 55, 0.3); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9em; }
+        .form-group select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn-submit { width: 100%; padding: 10px; background: #334155; color: white; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; }
+        .btn-submit:hover { background: #1e293b; }
     </style>
 </head>
 <body>
     <div class="nav-header">
-        <div class="nav-header-content">
-            <h1>
-                <i class="fa-solid fa-chart-line"></i>
-                Panel de Pedidos - Admin
-                <span class="fecha-dia"><i class="fa-solid fa-calendar-day"></i> {{ fecha_hoy }}</span>
-            </h1>
-            <div class="nav-links">
-                <a href="{% url 'admin-productos' %}" class="btn-nav">
-                    <i class="fa-solid fa-house"></i> Menú Principal
-                </a>
-                <a href="{% url 'inicio' %}" class="btn-nav salir">
-                    <i class="fa-solid fa-door-open"></i> Salir
-                </a>
-            </div>
+        <h2>
+            <i class="fa-solid fa-chart-line"></i>
+            Panel de Pedidos
+            <span class="fecha-dia"><i class="fa-solid fa-calendar-day"></i> {{ fecha_hoy }}</span>
+        </h2>
+        <div>
+            <a href="{% url 'panel-pedidos-admin' %}" class="btn-nav active"><i class="fa-solid fa-clipboard-list"></i> Pedidos</a>
+            <a href="{% url 'admin-productos' %}" class="btn-nav"><i class="fa-solid fa-burger"></i> Menú</a>
+            <a href="{% url 'admin-personal' %}" class="btn-nav"><i class="fa-solid fa-users"></i> Personal</a>
+            <a href="{% url 'historial-ventas' %}" class="btn-nav"><i class="fa-solid fa-chart-pie"></i> Historial</a>
+            <a href="{% url 'inicio' %}" class="btn-nav" style="background-color: #dc2626; margin-left: 10px;">
+                <i class="fa-solid fa-door-open"></i> Salir
+            </a>
         </div>
     </div>
 
-    <div class="container">
-        <!-- Estadísticas Diarias -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon blue">
-                    <i class="fa-solid fa-receipt"></i>
+    <div class="main-content-scroll">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue"><i class="fa-solid fa-receipt"></i></div>
+                    <div class="stat-info"><h3>{{ total_pedidos_hoy }}</h3><p>Pedidos Hoy</p></div>
                 </div>
-                <div class="stat-info">
-                    <h3>{{ total_pedidos_hoy }}</h3>
-                    <p>Pedidos de Hoy</p>
+                <div class="stat-card">
+                    <div class="stat-icon bg-green"><i class="fa-solid fa-sack-dollar"></i></div>
+                    <div class="stat-info"><h3>S/ {{ total_ingresos_hoy|floatformat:2 }}</h3><p>Ingresos Entregados</p></div>
                 </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon green">
-                    <i class="fa-solid fa-sack-dollar"></i>
+                <div class="stat-card">
+                    <div class="stat-icon bg-yellow"><i class="fa-solid fa-fire-burner"></i></div>
+                    <div class="stat-info"><h3>{{ pedidos_preparacion }}</h3><p>En Cocina</p></div>
                 </div>
-                <div class="stat-info">
-                    <h3>S/ {{ total_ingresos_hoy|floatformat:2 }}</h3>
-                    <p>Ingresos del Día</p>
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue"><i class="fa-solid fa-bell-concierge"></i></div>
+                    <div class="stat-info"><h3>{{ pedidos_listos }}</h3><p>Listos</p></div>
                 </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon yellow">
-                    <i class="fa-solid fa-fire-burner"></i>
-                </div>
-                <div class="stat-info">
-                    <h3>{{ pedidos_preparacion }}</h3>
-                    <p>En Preparación</p>
+                <div class="stat-card">
+                    <div class="stat-icon bg-purple"><i class="fa-solid fa-check-circle"></i></div>
+                    <div class="stat-info"><h3>{{ pedidos_entregados }}</h3><p>Entregados</p></div>
                 </div>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-icon blue">
-                    <i class="fa-solid fa-bell-concierge"></i>
-                </div>
-                <div class="stat-info">
-                    <h3>{{ pedidos_listos }}</h3>
-                    <p>Listos para Entregar</p>
-                </div>
+            <div class="card">
+                <form method="GET" class="filters-form">
+                    <div class="filter-group">
+                        <label><i class="fa-solid fa-filter"></i> Estado del Pedido</label>
+                        <select name="estado">
+                            <option value="">Todos los estados</option>
+                            <option value="En preparación" {% if estado_filtro == 'En preparación' %}selected{% endif %}>En preparación</option>
+                            <option value="Listo para entregar" {% if estado_filtro == 'Listo para entregar' %}selected{% endif %}>Listo para entregar</option>
+                            <option value="Entregado" {% if estado_filtro == 'Entregado' %}selected{% endif %}>Entregado</option>
+                            <option value="Cancelado" {% if estado_filtro == 'Cancelado' %}selected{% endif %}>Cancelado</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-filter"><i class="fa-solid fa-search"></i> Filtrar</button>
+                    <a href="{% url 'panel-pedidos-admin' %}" class="btn-clear"><i class="fa-solid fa-rotate-left"></i> Limpiar</a>
+                </form>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-icon purple">
-                    <i class="fa-solid fa-circle-check"></i>
-                </div>
-                <div class="stat-info">
-                    <h3>{{ pedidos_entregados }}</h3>
-                    <p>Entregados</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filtros -->
-        <div class="filters-card">
-            <form method="GET" class="filters-form">
-                <div class="filter-group">
-                    <label><i class="fa-solid fa-filter"></i> Filtrar por Estado</label>
-                    <select name="estado">
-                        <option value="">Todos los estados</option>
-                        <option value="En preparación" {% if estado_filtro == 'En preparación' %}selected{% endif %}>En preparación</option>
-                        <option value="Listo para entregar" {% if estado_filtro == 'Listo para entregar' %}selected{% endif %}>Listo para entregar</option>
-                        <option value="Entregado" {% if estado_filtro == 'Entregado' %}selected{% endif %}>Entregado</option>
-                        <option value="Cancelado" {% if estado_filtro == 'Cancelado' %}selected{% endif %}>Cancelado</option>
-                    </select>
+            <div class="card">
+                <div class="table-header">
+                    <h3><i class="fa-solid fa-list-ul"></i> Pedidos del Día</h3>
+                    <button onclick="confirmarFinalizarDia()" class="btn-finalizar-tabla">
+                        <i class="fa-solid fa-moon"></i> Finalizar Día
+                    </button>
                 </div>
 
-                <button type="submit" class="btn-filter">
-                    <i class="fa-solid fa-magnifying-glass"></i> Filtrar
-                </button>
-                <a href="{% url 'panel-pedidos-admin' %}" class="btn-clear">
-                    <i class="fa-solid fa-rotate-left"></i> Limpiar
-                </a>
-            </form>
-        </div>
-
-        <!-- Tabla de Pedidos -->
-        <div class="table-card">
-            <div class="table-header">
-                <h2><i class="fa-solid fa-list"></i> Pedidos del Día ({{ fecha_hoy }})</h2>
-                <button onclick="confirmarFinalizarDia()" class="btn-finalizar-tabla">
-                    <i class="fa-solid fa-moon"></i> Finalizar Día
-                </button>
-            </div>
-
-            {% if pedidos %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>N° Pedido</th>
-                        <th>Cliente</th>
-                        <th>Hora</th>
-                        <th>Total</th>
-                        <th>Estado</th>
-                        <th>Cajero</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for pedido in pedidos %}
-                    <tr>
-                        <td><strong>#{{ pedido.id }}</strong></td>
-                        <td>
-                            <i class="fa-solid fa-user"></i> {{ pedido.cliente }}
-                        </td>
-                        <td>
-                            <i class="fa-regular fa-clock"></i> {{ pedido.fecha|date:"H:i" }}
-                        </td>
-                        <td style="font-weight: bold; color: #10b981;">
-                            S/ {{ pedido.total|floatformat:2 }}
-                        </td>
-                        <td>
-                            <span class="estado-badge
-                                {% if pedido.estado == 'En preparación' %}estado-preparacion
-                                {% elif pedido.estado == 'Listo para entregar' %}estado-listo
-                                {% elif pedido.estado == 'Entregado' %}estado-entregado
-                                {% elif pedido.estado == 'Cancelado' %}estado-cancelado
-                                {% endif %}">
-                                {% if pedido.estado == 'En preparación' %}<i class="fa-solid fa-fire"></i>
-                                {% elif pedido.estado == 'Listo para entregar' %}<i class="fa-solid fa-bell"></i>
-                                {% elif pedido.estado == 'Entregado' %}<i class="fa-solid fa-circle-check"></i>
-                                {% elif pedido.estado == 'Cancelado' %}<i class="fa-solid fa-ban"></i>
-                                {% endif %}
-                                {{ pedido.estado }}
-                            </span>
-                        </td>
-                        <td>
-                            <i class="fa-solid fa-user-tie"></i>
-                            {% if pedido.usuario %}{{ pedido.usuario.username }}{% else %}Sistema{% endif %}
-                        </td>
-                        <td>
-                            <div class="btn-acciones">
-                                {% if pedido.estado == 'Entregado' %}
-                                    <span style="color: #10b981; font-weight: 600; font-size: 0.9em;">
-                                        <i class="fa-solid fa-circle-check"></i> Completado
-                                    </span>
-                                {% elif pedido.estado == 'Cancelado' %}
-                                    <span style="color: #ef4444; font-weight: 600; font-size: 0.9em;">
-                                        <i class="fa-solid fa-ban"></i> Cancelado
-                                    </span>
-                                {% else %}
+                {% if pedidos %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>N°</th>
+                            <th>Cliente</th>
+                            <th>Hora</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th>Cajero</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pedido in pedidos %}
+                        <tr>
+                            <td><strong>#{{ pedido.id }}</strong></td>
+                            <td>{{ pedido.cliente }}</td>
+                            <td>{{ pedido.fecha|date:"H:i" }}</td>
+                            <td style="font-weight: bold; color: #10b981;">S/ {{ pedido.total|floatformat:2 }}</td>
+                            <td>
+                                <span class="estado-badge
+                                    {% if pedido.estado == 'En preparación' %}estado-preparacion
+                                    {% elif pedido.estado == 'Listo para entregar' %}estado-listo
+                                    {% elif pedido.estado == 'Entregado' %}estado-entregado
+                                    {% elif pedido.estado == 'Cancelado' %}estado-cancelado
+                                    {% endif %}">
+                                    {{ pedido.estado }}
+                                </span>
+                            </td>
+                            <td>{% if pedido.usuario %}{{ pedido.usuario.username }}{% else %}Sistema{% endif %}</td>
+                            <td>
+                                {% if pedido.estado != 'Entregado' and pedido.estado != 'Cancelado' %}
                                     <button onclick="cambiarEstado({{ pedido.id }}, '{{ pedido.estado }}')" class="btn-cambiar">
-                                        <i class="fa-solid fa-rotate"></i> Cambiar Estado
+                                        <i class="fa-solid fa-sync"></i> Estado
                                     </button>
+                                {% else %}
+                                    <span style="color:#94a3b8; font-size:0.9em;">-</span>
                                 {% endif %}
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <div class="empty-state">
-                <i class="fa-solid fa-inbox"></i>
-                <p style="font-size: 1.2em; margin-top: 10px;">No hay pedidos activos para hoy</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div style="text-align: center; padding: 40px; color: #94a3b8;">
+                    <i class="fa-solid fa-inbox" style="font-size: 3em; margin-bottom: 10px;"></i>
+                    <p>No hay pedidos para mostrar</p>
+                </div>
+                {% endif %}
             </div>
-            {% endif %}
         </div>
     </div>
 
-    <!-- Modal Cambiar Estado -->
-    <div id="modalEstado" class="modal-overlay" onclick="cerrarModalEstadoSiFondo(event)">
+    <div id="modalEstado" class="modal-overlay" onclick="if(event.target.id==='modalEstado') cerrarModalEstado()">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fa-solid fa-rotate"></i> Cambiar Estado</h2>
-                <button onclick="cerrarModalEstado()" class="btn-close">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <h2>Cambiar Estado</h2>
+                <button onclick="cerrarModalEstado()" class="btn-close"><i class="fa-solid fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <form id="formCambiarEstado" method="POST" action="">
                     {% csrf_token %}
                     <div class="form-group">
-                        <label for="nuevoEstado">Nuevo estado:</label>
+                        <label>Nuevo estado:</label>
                         <select name="estado" id="nuevoEstado" required>
                             <option value="En preparación">En preparación</option>
                             <option value="Listo para entregar">Listo para entregar</option>
@@ -307,88 +257,41 @@
                             <option value="Cancelado">Cancelado</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn-submit">
-                        <i class="fa-solid fa-check"></i> Cambiar Estado
-                    </button>
+                    <button type="submit" class="btn-submit">Guardar Cambio</button>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Modal Confirmación Finalizar Día -->
-    <div id="modalConfirmar" class="modal-overlay" onclick="cerrarModalConfirmarSiFondo(event)">
-        <div class="modal-content modal-confirm">
-            <div class="modal-header">
-                <h2><i class="fa-solid fa-triangle-exclamation"></i> Confirmar Finalizar Día</h2>
-                <button onclick="cerrarModalConfirmar()" class="btn-close">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
+    <div id="modalConfirmar" class="modal-overlay" onclick="if(event.target.id==='modalConfirmar') cerrarModalConfirmar()">
+        <div class="modal-content" style="text-align: center;">
             <div class="modal-body">
-                <div class="icon-warning">
-                    <i class="fa-solid fa-moon"></i>
-                </div>
-                <p><strong>¿Está seguro de finalizar el día?</strong><br><br>
-                Esta acción realizará lo siguiente:<br>
-                • Los pedidos <strong>Entregados</strong> permanecerán en el historial<br>
-                • Los pedidos <strong>En Preparación</strong> y <strong>Listos</strong> se cancelarán<br>
-                • Se reiniciará el panel para el siguiente día</p>
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 3em; color: #f59e0b; margin-bottom: 15px;"></i>
+                <h3 style="margin-bottom: 10px; color: #333;">¿Finalizar el día?</h3>
+                <p style="color: #64748b; font-size: 0.95em; line-height: 1.5;">
+                    Los pedidos pendientes se cancelarán y el panel se reiniciará para mañana.
+                </p>
                 <div class="btns-confirm">
-                    <form method="POST" action="{% url 'finalizar-dia' %}" style="display: inline;">
+                    <form method="POST" action="{% url 'finalizar-dia' %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn-confirm-action btn-confirm-si">
-                            <i class="fa-solid fa-check"></i> Sí, Finalizar
-                        </button>
+                        <button type="submit" class="btn-confirm-action btn-confirm-si">Sí, Finalizar</button>
                     </form>
-                    <button onclick="cerrarModalConfirmar()" class="btn-confirm-action btn-confirm-no">
-                        <i class="fa-solid fa-xmark"></i> Cancelar
-                    </button>
+                    <button onclick="cerrarModalConfirmar()" class="btn-confirm-action btn-confirm-no">Cancelar</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Cambiar estado del pedido
         function cambiarEstado(pedidoId, estadoActual) {
             const form = document.getElementById('formCambiarEstado');
             form.action = `/pedidos/actualizar-estado/${pedidoId}/`;
             document.getElementById('nuevoEstado').value = estadoActual;
             document.getElementById('modalEstado').style.display = 'flex';
         }
-
-        function cerrarModalEstado() {
-            document.getElementById('modalEstado').style.display = 'none';
-        }
-
-        function cerrarModalEstadoSiFondo(event) {
-            if (event.target.id === 'modalEstado') {
-                cerrarModalEstado();
-            }
-        }
-
-        // Modal de confirmación para finalizar día
-        function confirmarFinalizarDia() {
-            document.getElementById('modalConfirmar').style.display = 'flex';
-        }
-
-        function cerrarModalConfirmar() {
-            document.getElementById('modalConfirmar').style.display = 'none';
-        }
-
-        function cerrarModalConfirmarSiFondo(event) {
-            if (event.target.id === 'modalConfirmar') {
-                cerrarModalConfirmar();
-            }
-        }
-
-        // Cerrar modales con tecla ESC
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                cerrarModalEstado();
-                cerrarModalConfirmar();
-            }
-        });
+        function cerrarModalEstado() { document.getElementById('modalEstado').style.display = 'none'; }
+        function confirmarFinalizarDia() { document.getElementById('modalConfirmar').style.display = 'flex'; }
+        function cerrarModalConfirmar() { document.getElementById('modalConfirmar').style.display = 'none'; }
     </script>
 </body>
 </html>
