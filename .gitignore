@@ -3,12 +3,6 @@ venv/
 __pycache__/
 *.pyc
 
-# Ignorar base de datos local (porque usas SQL Server)
-db.sqlite3
-
 # Ignorar configuraciones del editor (PyCharm/VSCode)
 .idea/
 .vscode/
-
-# IMPORTANTE: NO agregamos 'media/' aquí para que las fotos SÍ se suban.
-# media/

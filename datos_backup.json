@@ -1,18 +1,36 @@
-[
+﻿[
 {
   "model": "auth.user",
-  "pk": 1,
+  "pk": 3,
   "fields": {
-    "password": "pbkdf2_sha256$1000000$8yFiW2Boww6GFltM9v1TBf$dF40F+wx0w6Jszf/QsARBsk8izhT4N3xvIgtgI/Uie8=",
-    "last_login": null,
-    "is_superuser": false,
+    "password": "pbkdf2_sha256$1000000$4NmpZyORbFFbLHcoetlagg$D3OwGXb5vLQ+1UK9qOq7ECcR/mK/Niey1x68R8ZkN3A=",
+    "last_login": "2025-11-24T06:49:30.720Z",
+    "is_superuser": true,
     "username": "a",
-    "first_name": "a",
-    "last_name": "a",
-    "email": "a@a.com",
+    "first_name": "Super",
+    "last_name": "Admin",
+    "email": "admin@sistema.local",
     "is_staff": true,
     "is_active": true,
-    "date_joined": "2025-11-17T04:28:52.516Z",
+    "date_joined": "2025-11-24T04:59:29.712Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 13,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$77iPtMph1SQrUciCkEzbsU$TRRe5oosgUbV/SGP/okO0kTSdoiw8Lr2vF/UMnykSXQ=",
+    "last_login": "2025-11-24T06:41:54.007Z",
+    "is_superuser": false,
+    "username": "Cajero1",
+    "first_name": "Sin",
+    "last_name": "Paga",
+    "email": "asda@sdasda",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-11-24T06:15:58.654Z",
     "groups": [],
     "user_permissions": []
   }
@@ -115,7 +133,7 @@
     "descripcion": "",
     "precio": "15.00",
     "categoria": "Hamburguesas",
-    "imagen": "",
+    "imagen": "productos/2146461451_1.webp",
     "insumos": [
       9,
       11,
@@ -132,7 +150,7 @@
     "descripcion": "",
     "precio": "18.00",
     "categoria": "Hamburguesas",
-    "imagen": "",
+    "imagen": "productos/Sin_tÝtulo.jpg",
     "insumos": [
       9,
       11,
@@ -150,7 +168,10 @@
     "fecha": "2025-11-17T02:39:27.605Z",
     "total": "53.00",
     "estado": "Entregado",
-    "cliente": "Cliente General"
+    "cliente": "Cliente General",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -160,7 +181,10 @@
     "fecha": "2025-11-17T02:39:36.717Z",
     "total": "45.00",
     "estado": "Entregado",
-    "cliente": "Cliente General"
+    "cliente": "Cliente General",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -170,7 +194,10 @@
     "fecha": "2025-11-17T02:41:44.552Z",
     "total": "24.50",
     "estado": "Cancelado",
-    "cliente": "Cliente General"
+    "cliente": "Cliente General",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -180,7 +207,10 @@
     "fecha": "2025-11-17T02:41:55.687Z",
     "total": "74.50",
     "estado": "Entregado",
-    "cliente": "Cliente General"
+    "cliente": "Cliente General",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -190,7 +220,10 @@
     "fecha": "2025-11-17T03:44:40.519Z",
     "total": "32.00",
     "estado": "Entregado",
-    "cliente": "Cliente Mostrador"
+    "cliente": "Cliente Mostrador",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -200,7 +233,10 @@
     "fecha": "2025-11-17T04:18:03.553Z",
     "total": "45.00",
     "estado": "Entregado",
-    "cliente": "Cliente Mostrador"
+    "cliente": "Cliente Mostrador",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -210,7 +246,10 @@
     "fecha": "2025-11-17T04:19:59.692Z",
     "total": "45.00",
     "estado": "Cancelado",
-    "cliente": "Cliente Mostrador"
+    "cliente": "Cliente Mostrador",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -220,7 +259,10 @@
     "fecha": "2025-11-17T05:02:45.235Z",
     "total": "45.00",
     "estado": "Entregado",
-    "cliente": "Cliente Mostrador"
+    "cliente": "Cliente Mostrador",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -230,7 +272,10 @@
     "fecha": "2025-11-17T05:48:48.976Z",
     "total": "18.50",
     "estado": "Entregado",
-    "cliente": "Cliente Mostrador"
+    "cliente": "Cliente Mostrador",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -240,7 +285,10 @@
     "fecha": "2025-11-17T06:03:13.069Z",
     "total": "25.00",
     "estado": "Cancelado",
-    "cliente": ""
+    "cliente": "",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -250,7 +298,10 @@
     "fecha": "2025-11-17T06:06:23.147Z",
     "total": "15.00",
     "estado": "Cancelado",
-    "cliente": "Eduardo"
+    "cliente": "Eduardo",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -260,7 +311,10 @@
     "fecha": "2025-11-17T06:06:45.368Z",
     "total": "17.00",
     "estado": "Cancelado",
-    "cliente": ""
+    "cliente": "",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -270,7 +324,10 @@
     "fecha": "2025-11-17T06:22:46.100Z",
     "total": "50.00",
     "estado": "Cancelado",
-    "cliente": "a"
+    "cliente": "a",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -280,7 +337,10 @@
     "fecha": "2025-11-17T06:24:27.344Z",
     "total": "30.00",
     "estado": "Cancelado",
-    "cliente": ""
+    "cliente": "",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -290,7 +350,10 @@
     "fecha": "2025-11-17T06:32:47.828Z",
     "total": "32.00",
     "estado": "Entregado",
-    "cliente": "ASDASD"
+    "cliente": "ASDASD",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -300,7 +363,10 @@
     "fecha": "2025-11-17T06:33:38.782Z",
     "total": "15.00",
     "estado": "Entregado",
-    "cliente": "A"
+    "cliente": "A",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
   }
 },
 {
@@ -310,7 +376,88 @@
     "fecha": "2025-11-17T06:40:53.814Z",
     "total": "223.00",
     "estado": "Entregado",
-    "cliente": "JA"
+    "cliente": "JA",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": false
+  }
+},
+{
+  "model": "pedidos.pedido",
+  "pk": 19,
+  "fields": {
+    "fecha": "2025-11-24T02:25:22.424Z",
+    "total": "33.00",
+    "estado": "Entregado",
+    "cliente": "a",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": true
+  }
+},
+{
+  "model": "pedidos.pedido",
+  "pk": 20,
+  "fields": {
+    "fecha": "2025-11-24T03:18:12.206Z",
+    "total": "45.00",
+    "estado": "Entregado",
+    "cliente": "ada",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": true
+  }
+},
+{
+  "model": "pedidos.pedido",
+  "pk": 21,
+  "fields": {
+    "fecha": "2025-11-24T05:56:21.106Z",
+    "total": "45.00",
+    "estado": "Entregado",
+    "cliente": "Roberto",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": true
+  }
+},
+{
+  "model": "pedidos.pedido",
+  "pk": 22,
+  "fields": {
+    "fecha": "2025-11-24T06:06:00.284Z",
+    "total": "15.00",
+    "estado": "Entregado",
+    "cliente": "a",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": true
+  }
+},
+{
+  "model": "pedidos.pedido",
+  "pk": 23,
+  "fields": {
+    "fecha": "2025-11-24T06:15:15.367Z",
+    "total": "78.00",
+    "estado": "Entregado",
+    "cliente": "asdasd",
+    "metodo_pago": "Efectivo",
+    "usuario": null,
+    "finalizado": true
+  }
+},
+{
+  "model": "pedidos.pedido",
+  "pk": 24,
+  "fields": {
+    "fecha": "2025-11-24T06:18:38.787Z",
+    "total": "36.00",
+    "estado": "Entregado",
+    "cliente": "dasdasa",
+    "metodo_pago": "Tarjeta",
+    "usuario": 13,
+    "finalizado": true
   }
 },
 {
@@ -440,6 +587,166 @@
     "pedido": 18,
     "producto": 11,
     "cantidad": 4,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 16,
+  "fields": {
+    "pedido": 19,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 17,
+  "fields": {
+    "pedido": 19,
+    "producto": 11,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 18,
+  "fields": {
+    "pedido": 20,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 19,
+  "fields": {
+    "pedido": 20,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 20,
+  "fields": {
+    "pedido": 20,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 21,
+  "fields": {
+    "pedido": 21,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 22,
+  "fields": {
+    "pedido": 21,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 23,
+  "fields": {
+    "pedido": 21,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 24,
+  "fields": {
+    "pedido": 22,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 25,
+  "fields": {
+    "pedido": 23,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 26,
+  "fields": {
+    "pedido": 23,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 27,
+  "fields": {
+    "pedido": 23,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 28,
+  "fields": {
+    "pedido": 23,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 29,
+  "fields": {
+    "pedido": 23,
+    "producto": 11,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 30,
+  "fields": {
+    "pedido": 24,
+    "producto": 11,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 31,
+  "fields": {
+    "pedido": 24,
+    "producto": 11,
+    "cantidad": 1,
     "personalizacion": ""
   }
 }
