@@ -27,6 +27,8 @@ def registrar_pedido_vista(request):
             try:
                 pedido_json = json.loads(pedido_data)
                 cliente = request.POST.get('cliente', 'Cliente General')
+                # Capturamos el método de pago
+                metodo_pago = request.POST.get('metodo_pago', 'Efectivo')
 
                 # 1. Calcular total
                 total = 0
@@ -37,11 +39,13 @@ def registrar_pedido_vista(request):
                     subtotal = (precio_base + precio_extras) * cantidad
                     total += subtotal
 
-                # 2. Crear Pedido
+                # 2. Crear Pedido con el método de pago
                 pedido = Pedido.objects.create(
                     cliente=cliente,
                     total=total,
-                    estado='En preparación'
+                    estado='En preparación',
+                    metodo_pago=metodo_pago,
+                    usuario=request.user
                 )
 
                 # 3. Crear Detalles
@@ -71,6 +75,7 @@ def registrar_pedido_vista(request):
         else:
             messages.warning(request, 'El carrito está vacío')
 
+    # ... (el resto de la vista GET se mantiene igual) ...
     productos_bd = Producto.objects.prefetch_related('insumos').all()
     insumos_bd = Insumo.objects.all()
 
@@ -89,7 +94,6 @@ def registrar_pedido_vista(request):
         'extras_json': extras_json
     }
     return render(request, 'pedidos/registrar_pedido.html', contexto)
-
 
 # HU-02: Personalizar producto
 def personalizar_producto_vista(request, producto_id):
@@ -448,24 +452,26 @@ def exportar_ventas_excel(request):
 def panel_pedidos_admin_vista(request):
     from django.utils import timezone
 
-    # Obtener pedidos SOLO del día actual (incluyendo entregados)
+    # Definir rango del día actual
     hoy_inicio = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
     hoy_fin = hoy_inicio + timedelta(days=1)
 
+    # CAMBIO PRINCIPAL: Filtramos por finalizado=False
+    # Así, los pedidos del día que ya se "cerraron" no aparecen aquí.
     pedidos_hoy = Pedido.objects.filter(
         fecha__gte=hoy_inicio,
-        fecha__lt=hoy_fin
+        fecha__lt=hoy_fin,
+        finalizado=False
     ).order_by('-fecha')
 
-    # Filtro por estado
+    # Filtro por estado (se mantiene igual)
     estado_filtro = request.GET.get('estado', '')
     if estado_filtro:
         pedidos_hoy = pedidos_hoy.filter(estado=estado_filtro)
 
-    # Estadísticas DIARIAS
+    # Estadísticas (solo de lo visible en el turno actual)
     total_pedidos_hoy = pedidos_hoy.count()
 
-    # Ingresos SOLO de pedidos ENTREGADOS
     pedidos_entregados_hoy = pedidos_hoy.filter(estado='Entregado')
     total_ingresos_hoy = sum(pedido.total for pedido in pedidos_entregados_hoy)
 
@@ -489,45 +495,38 @@ def panel_pedidos_admin_vista(request):
     return render(request, 'pedidos/panel_pedidos_admin.html', contexto)
 
 
-# Finalizar día - ACTUALIZADO
 def finalizar_dia_vista(request):
     from django.utils import timezone
 
     if request.method == 'POST':
-        # Obtener pedidos del día actual
         hoy_inicio = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
         hoy_fin = hoy_inicio + timedelta(days=1)
 
-        # Pedidos que ya están entregados (se quedan en historial)
-        pedidos_entregados = Pedido.objects.filter(
-            fecha__gte=hoy_inicio,
-            fecha__lt=hoy_fin,
-            estado='Entregado'
-        )
-
-        # Pedidos activos que NO fueron entregados (se cancelarán)
+        # 1. Cancelar pendientes activos que NO estén finalizados
         pedidos_activos = Pedido.objects.filter(
             fecha__gte=hoy_inicio,
             fecha__lt=hoy_fin,
-            estado__in=['En preparación', 'Listo para entregar']
+            estado__in=['En preparación', 'Listo para entregar'],
+            finalizado=False
         )
-
-        cantidad_entregados = pedidos_entregados.count()
         cantidad_cancelados = pedidos_activos.count()
-
-        # Cancelar todos los pedidos activos que no se entregaron
         pedidos_activos.update(estado='Cancelado')
 
+        # 2. Marcar TODOS los pedidos visibles de hoy como FINALIZADOS
+        # Esto hará que dejen de salir en el panel_pedidos_admin_vista
+        todos_pedidos_visibles = Pedido.objects.filter(
+            fecha__gte=hoy_inicio,
+            fecha__lt=hoy_fin,
+            finalizado=False
+        )
+        todos_pedidos_visibles.update(finalizado=True)
+
+        # Mensajes sin emojis, solo texto limpio
         if cantidad_cancelados > 0:
-            messages.success(
-                request,
-                f'✅ Día finalizado. {cantidad_entregados} pedidos entregados en el historial. {cantidad_cancelados} pedidos pendientes fueron cancelados.'
-            )
+            messages.success(request,
+                             f'Día finalizado. {cantidad_cancelados} pedidos pendientes fueron cancelados y el panel se ha limpiado.')
         else:
-            messages.success(
-                request,
-                f'✅ Día finalizado correctamente. {cantidad_entregados} pedidos entregados disponibles en el historial de ventas.'
-            )
+            messages.success(request, 'Día finalizado. El panel se ha limpiado correctamente.')
 
         return redirect('panel-pedidos-admin')
 

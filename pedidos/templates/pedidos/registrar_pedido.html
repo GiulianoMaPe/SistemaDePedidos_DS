@@ -7,7 +7,7 @@
     <title>Registrar Pedido - Coco's Burger</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ... (Todos tus estilos anteriores) ... */
+        /* ... (Tus estilos anteriores se mantienen) ... */
         body, html { height: 100vh; margin: 0; font-family: Arial, sans-serif; background-color: #f0f0f0; overflow: hidden; display: flex; flex-direction: column; }
         .nav-header { background-color: #722f37; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex-shrink: 0; }
         .nav-header h2 { margin: 0; font-size: 1.5em; display: flex; align-items: center; gap: 10px; }
@@ -18,20 +18,13 @@
         .btn-exit { background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1em; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: background-color 0.3s; margin-left: 10px; }
         .btn-exit:hover { background-color: #c82333; }
 
-        /* ... (resto de estilos) ... */
         .main-container { display: flex; flex-grow: 1; overflow: hidden; }
         .menu-container { width: 65%; display: flex; flex-direction: column; border-right: 1px solid #ccc; }
 
-        /* CORRECCIÓN AQUÍ: Se agregan propiedades para evitar estiramiento vertical */
         .product-grid {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
-            align-content: start; /* Alinea el contenido al inicio verticalmente */
-            grid-auto-rows: min-content; /* Las filas toman la altura de su contenido */
+            flex-grow: 1; overflow-y: auto; padding: 20px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px; align-content: start; grid-auto-rows: min-content;
         }
 
         .product-card { background-color: white; border: 1px solid #ddd; border-radius: 8px; padding: 10px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
@@ -71,10 +64,12 @@
 
         .add-extra-btn { background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-top: 5px; display:inline-flex; align-items:center; gap:5px; }
 
+        /* Modales */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background-color: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); position: relative; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
         .modal-close { background: none; border: none; font-size: 1.5em; cursor: pointer; color: #aaa; }
+
         .extra-option { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f5f5f5; cursor: pointer; border-radius: 4px; }
         .extra-option:hover { background-color: #f9f9f9; }
         .extra-option.selected { background-color: #e6f7ff; border: 1px solid #007bff; }
@@ -82,6 +77,19 @@
         .extra-price { color: #28a745; font-size: 0.9em; }
         .modal-footer { margin-top: 20px; text-align: right; }
         .save-btn { padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; }
+
+        /* Estilos específicos Modal Pago */
+        .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        .btn-pay-option {
+            padding: 20px; border: 2px solid #eee; border-radius: 10px; background: white;
+            cursor: pointer; transition: all 0.2s; text-align: center;
+        }
+        .btn-pay-option:hover { border-color: #722f37; background-color: #fff5f5; transform: translateY(-3px); }
+        .btn-pay-option i { font-size: 2em; display: block; margin-bottom: 10px; color: #555; }
+        .btn-pay-option span { font-weight: bold; font-size: 1.1em; color: #333; }
+
+        .btn-pay-efectivo:hover i { color: #28a745; }
+        .btn-pay-tarjeta:hover i { color: #007bff; }
     </style>
 </head>
 <body>
@@ -118,11 +126,14 @@
         </div>
 
         <div class="action-bar">
-            <form method="POST" action="">
+            <form method="POST" action="" id="formPedido">
                 {% csrf_token %}
                 <input type="hidden" name="pedido_data" id="pedido_data_input">
-                <input type="text" name="cliente" class="client-input" placeholder="Nombre del Cliente" autocomplete="off">
-                <button type="submit" class="confirm-button"><i class="fa-solid fa-check"></i> Confirmar Compra</button>
+                <input type="hidden" name="metodo_pago" id="input_metodo_pago"> <input type="text" name="cliente" class="client-input" placeholder="Nombre del Cliente (Opcional)" autocomplete="off">
+
+                <button type="button" class="confirm-button" onclick="prepararCompra()">
+                    <i class="fa-solid fa-check"></i> Confirmar Compra
+                </button>
             </form>
         </div>
     </div>
@@ -154,6 +165,26 @@
         <div id="extras-list-container"></div>
         <div class="modal-footer">
             <button class="save-btn" onclick="guardarExtrasModal()">Añadir</button>
+        </div>
+    </div>
+</div>
+
+<div id="payment-modal" class="modal-overlay" onclick="if(event.target.id === 'payment-modal') cerrarModalPago()">
+    <div class="modal-content" onclick="event.stopPropagation()" style="text-align: center;">
+        <div class="modal-header">
+            <h4>Seleccione Método de Pago</h4>
+            <button class="modal-close" onclick="cerrarModalPago()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="payment-options">
+            <button class="btn-pay-option btn-pay-efectivo" onclick="finalizarPedido('Efectivo')">
+                <i class="fa-solid fa-money-bill-wave"></i>
+                <span>Efectivo</span>
+            </button>
+            <button class="btn-pay-option btn-pay-tarjeta" onclick="finalizarPedido('Tarjeta')">
+                <i class="fa-regular fa-credit-card"></i>
+                <span>Tarjeta</span>
+            </button>
         </div>
     </div>
 </div>
@@ -232,6 +263,26 @@
         totalElement.textContent = `S/ ${total.toFixed(2)}`;
         pedidoDataInput.value = JSON.stringify(pedido);
     }
+
+    // --- Funciones Nuevas para el Pago ---
+    function prepararCompra() {
+        const pedidoData = document.getElementById('pedido_data_input').value;
+        if (!pedidoData || pedidoData === '{}') {
+            alert('El carrito está vacío.');
+            return;
+        }
+        document.getElementById('payment-modal').style.display = 'flex';
+    }
+
+    function cerrarModalPago() {
+        document.getElementById('payment-modal').style.display = 'none';
+    }
+
+    function finalizarPedido(metodo) {
+        document.getElementById('input_metodo_pago').value = metodo;
+        document.getElementById('formPedido').submit();
+    }
+    // -------------------------------------
 
     function agregarAlPedido(pId, nombre, precio, ingredientesBase) {
         const idUnico = itemIdCounter++;

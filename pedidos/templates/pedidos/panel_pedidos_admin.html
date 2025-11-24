@@ -97,7 +97,7 @@
 
         /* Modales */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.2s; }
+        .modal-content { background: white; width: 90%; max-width: 450px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.2s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         .modal-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .modal-header h2 { margin: 0; font-size: 1.2em; color: #333; }
@@ -105,16 +105,21 @@
         .btn-close:hover { color: #333; }
         .modal-body { padding: 20px; }
 
+        /* Estilos Botones de Estado en Modal */
+        .btn-estado { width: 100%; padding: 12px; margin-bottom: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform 0.2s; color: white; }
+        .btn-estado:hover { opacity: 0.9; transform: scale(1.02); }
+        .btn-estado:last-child { margin-bottom: 0; }
+
+        .btn-preparacion { background-color: #f59e0b; color: #000; } /* Amarillo */
+        .btn-listo { background-color: #0ea5e9; } /* Azul */
+        .btn-entregado { background-color: #10b981; } /* Verde */
+        .btn-cancelado { background-color: #ef4444; } /* Rojo */
+
+        /* Estilos Modal Confirmación Finalizar */
         .btns-confirm { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
         .btn-confirm-action { padding: 8px 20px; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; }
         .btn-confirm-si { background: #f59e0b; color: white; }
         .btn-confirm-no { background: #e2e8f0; color: #475569; }
-
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9em; }
-        .form-group select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        .btn-submit { width: 100%; padding: 10px; background: #334155; color: white; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; }
-        .btn-submit:hover { background: #1e293b; }
     </style>
 </head>
 <body>
@@ -218,7 +223,7 @@
                             <td>{% if pedido.usuario %}{{ pedido.usuario.username }}{% else %}Sistema{% endif %}</td>
                             <td>
                                 {% if pedido.estado != 'Entregado' and pedido.estado != 'Cancelado' %}
-                                    <button onclick="cambiarEstado({{ pedido.id }}, '{{ pedido.estado }}')" class="btn-cambiar">
+                                    <button onclick="cambiarEstado({{ pedido.id }})" class="btn-cambiar">
                                         <i class="fa-solid fa-sync"></i> Estado
                                     </button>
                                 {% else %}
@@ -246,18 +251,25 @@
                 <button onclick="cerrarModalEstado()" class="btn-close"><i class="fa-solid fa-times"></i></button>
             </div>
             <div class="modal-body">
+                <p style="text-align:center; margin-bottom:15px; color:#666;">Selecciona el nuevo estado:</p>
                 <form id="formCambiarEstado" method="POST" action="">
                     {% csrf_token %}
-                    <div class="form-group">
-                        <label>Nuevo estado:</label>
-                        <select name="estado" id="nuevoEstado" required>
-                            <option value="En preparación">En preparación</option>
-                            <option value="Listo para entregar">Listo para entregar</option>
-                            <option value="Entregado">Entregado</option>
-                            <option value="Cancelado">Cancelado</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn-submit">Guardar Cambio</button>
+
+                    <button type="submit" name="estado" value="En preparación" class="btn-estado btn-preparacion">
+                        <i class="fa-solid fa-fire-burner"></i> En preparación
+                    </button>
+
+                    <button type="submit" name="estado" value="Listo para entregar" class="btn-estado btn-listo">
+                        <i class="fa-solid fa-bell-concierge"></i> Listo para entregar
+                    </button>
+
+                    <button type="submit" name="estado" value="Entregado" class="btn-estado btn-entregado">
+                        <i class="fa-solid fa-check-circle"></i> Entregado
+                    </button>
+
+                    <button type="submit" name="estado" value="Cancelado" class="btn-estado btn-cancelado">
+                        <i class="fa-solid fa-ban"></i> Cancelado
+                    </button>
                 </form>
             </div>
         </div>
@@ -283,13 +295,15 @@
     </div>
 
     <script>
-        function cambiarEstado(pedidoId, estadoActual) {
+        function cambiarEstado(pedidoId) {
             const form = document.getElementById('formCambiarEstado');
+            // Configuramos la URL de acción con el ID del pedido seleccionado
             form.action = `/pedidos/actualizar-estado/${pedidoId}/`;
-            document.getElementById('nuevoEstado').value = estadoActual;
             document.getElementById('modalEstado').style.display = 'flex';
         }
+
         function cerrarModalEstado() { document.getElementById('modalEstado').style.display = 'none'; }
+
         function confirmarFinalizarDia() { document.getElementById('modalConfirmar').style.display = 'flex'; }
         function cerrarModalConfirmar() { document.getElementById('modalConfirmar').style.display = 'none'; }
     </script>

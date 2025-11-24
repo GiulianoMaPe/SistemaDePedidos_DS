@@ -49,25 +49,27 @@
         /* Tarjeta de Detalle */
         .card { background: white; border-radius: 8px; padding: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; margin-top: 20px; }
 
-        /* --- HEADER DE LA VENTA MODIFICADO --- */
+        /* --- HEADER DE LA VENTA --- */
         .venta-header {
             background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
             color: white;
             padding: 25px 30px;
-            /* Flexbox para alinear Título a la izq y Botón a la derecha */
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .header-text {
-            text-align: left;
-        }
+        .header-text { text-align: left; }
         .header-text h2 { margin: 0; font-size: 2em; margin-bottom: 5px; line-height: 1; }
         .header-text .fecha { opacity: 0.8; font-size: 0.95em; margin: 0; }
 
-        /* Botón dentro del header */
-        .btn-back-header {
+        /* Grupo de Botones en el Header */
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action-header {
             background-color: rgba(255, 255, 255, 0.15);
             color: white;
             border: 1px solid rgba(255,255,255,0.3);
@@ -81,11 +83,15 @@
             align-items: center;
             gap: 8px;
             white-space: nowrap;
+            cursor: pointer;
         }
-        .btn-back-header:hover {
+        .btn-action-header:hover {
             background-color: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
         }
+        /* Estilo especial para Imprimir */
+        .btn-print { background-color: #f59e0b; border-color: #f59e0b; color: #fff; }
+        .btn-print:hover { background-color: #d97706; }
 
         /* Resto de secciones */
         .info-section { padding: 25px; border-bottom: 1px solid #f1f5f9; }
@@ -109,6 +115,20 @@
         }
         .total-label { font-size: 1.3em; font-weight: bold; color: #334155; }
         .total-value { font-size: 2em; font-weight: bold; color: #10b981; }
+
+        /* --- ESTILOS DE IMPRESIÓN --- */
+        @media print {
+            .nav-header, .header-actions { display: none !important; }
+            body, html { height: auto; overflow: visible; background-color: white; }
+            .main-content-scroll { overflow: visible; padding: 0; }
+            .container { max-width: 100%; width: 100%; margin: 0; }
+            .card { box-shadow: none; border: 1px solid #ddd; margin-top: 0; }
+            .venta-header { color: black !important; background: none !important; border-bottom: 2px solid #000; padding: 20px 0; text-align: center; display: block; }
+            .venta-header h2 { font-size: 2em; margin-bottom: 10px; }
+            .venta-header .fecha { color: #333; }
+            .info-section, .productos-section, .total-section { padding: 15px 0; }
+            table th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+        }
     </style>
 </head>
 <body>
@@ -136,9 +156,14 @@
                         <p class="fecha"><i class="fa-regular fa-clock"></i> {{ venta.fecha|date:"d/m/Y - H:i" }}</p>
                     </div>
 
-                    <a href="{% url 'historial-ventas' %}" class="btn-back-header">
-                        <i class="fa-solid fa-arrow-left"></i> Volver al Historial
-                    </a>
+                    <div class="header-actions">
+                        <button onclick="window.print()" class="btn-action-header btn-print">
+                            <i class="fa-solid fa-print"></i> Imprimir
+                        </button>
+                        <a href="{% url 'historial-ventas' %}" class="btn-action-header">
+                            <i class="fa-solid fa-arrow-left"></i> Volver
+                        </a>
+                    </div>
                 </div>
 
                 <div class="info-section">
@@ -160,9 +185,24 @@
                         <span class="info-label">Atendido por</span>
                         <span class="info-value">
                             {% if venta.usuario %}
-                                <i class="fa-solid fa-user-tag"></i> {{ venta.usuario.username }}
+                                <i class="fa-solid fa-user-tag"></i>
+                                {% if venta.usuario.first_name or venta.usuario.last_name %}
+                                    {{ venta.usuario.first_name }} {{ venta.usuario.last_name }}
+                                {% else %}
+                                    {{ venta.usuario.username }}
+                                {% endif %}
                             {% else %}
                                 <i>Sistema</i>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Método de Pago</span>
+                        <span class="info-value">
+                            {% if venta.metodo_pago == 'Tarjeta' %}
+                                <i class="fa-regular fa-credit-card"></i> Tarjeta
+                            {% else %}
+                                <i class="fa-solid fa-money-bill-wave"></i> Efectivo
                             {% endif %}
                         </span>
                     </div>
