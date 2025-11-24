@@ -7,7 +7,7 @@
     <title>Administración - Cocos Burger</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ... (Estilos existentes se mantienen) ... */
+        /* ... (Mismos estilos originales) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { height: 100vh; width: 100vw; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; overflow: hidden; }
         .workspace { height: 100vh; width: 100vw; display: grid; grid-template-columns: 1fr 1fr; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
@@ -31,7 +31,7 @@
         .tools-title { display: flex; align-items: center; gap: 0.5vw; font-weight: 700; font-size: clamp(12px, 0.85vw, 15px); margin-bottom: 1.5vh; color: #60a5fa; }
         .admin-tools ul { list-style: none; padding-left: 0; }
         .admin-tools li { padding: 0.8vh 0; padding-left: 1.5vw; position: relative; font-size: clamp(11px, 0.8vw, 14px); line-height: 1.5; color: rgba(255, 255, 255, 0.75); }
-        .admin-tools li::before { content: '⚙'; position: absolute; left: 0; color: #60a5fa; font-size: 0.9em; }
+        .admin-tools li::before { content: '\f0ad'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; left: 0; color: #60a5fa; font-size: 0.9em; }
 
         .right-panel { display: flex; align-items: center; justify-content: center; padding: 4vh 5vw; background: #020617; }
         .login-container { width: 100%; max-width: 500px; }
@@ -94,12 +94,12 @@
                 </div>
                 <div class="system-status">
                     <div class="status-title">Estado del Sistema</div>
-                    <div class="status-detail"><span class="status-icon">📊</span><span>Base de Datos: <strong>En Línea</strong></span></div>
-                    <div class="status-detail"><span class="status-icon">🔒</span><span>Seguridad: <strong>Activa</strong></span></div>
-                    <div class="status-detail"><span class="status-icon">📅</span><span id="current-date">Cargando...</span></div>
+                    <div class="status-detail"><span class="status-icon"><i class="fa-solid fa-database"></i></span><span>Base de Datos: <strong>En Línea</strong></span></div>
+                    <div class="status-detail"><span class="status-icon"><i class="fa-solid fa-lock"></i></span><span>Seguridad: <strong>Activa</strong></span></div>
+                    <div class="status-detail"><span class="status-icon"><i class="fa-regular fa-calendar"></i></span><span id="current-date">Cargando...</span></div>
                 </div>
                 <div class="admin-tools">
-                    <div class="tools-title"><span>🛠️</span><span>Módulos Disponibles</span></div>
+                    <div class="tools-title"><span><i class="fa-solid fa-toolbox"></i></span><span>Módulos Disponibles</span></div>
                     <ul>
                         <li>Gestión de Inventario y Productos</li>
                         <li>Administración de Usuarios y Roles</li>
@@ -115,12 +115,24 @@
                     <p class="session-subtitle">Acceso restringido. Ingrese sus credenciales maestras para continuar.</p>
                     <div class="role-badge"><span class="secure-indicator"></span><span>ACCESO SEGURO - ADMIN</span></div>
                 </div>
+
+                {% if messages %}
+                <div style="margin-bottom: 20px;">
+                    {% for message in messages %}
+                    <div style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #bfdbfe; padding: 10px; border-radius: 8px; font-size: 0.9em; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
                 <form method="post">
                     {% csrf_token %}
                     <div class="form-field">
-                        <label class="field-label" for="usuario">ID Administrador</label>
+                        <label class="field-label" for="username">ID Administrador</label>
                         <div class="input-group">
-                            <input type="text" id="usuario" name="usuario" placeholder="Ej: admin.gerencia" required autocomplete="username" autofocus>
+                            <input type="text" id="username" name="username" placeholder="Ej: admin" required autocomplete="username" autofocus>
                             <span class="field-icon"><i class="fa-solid fa-shield-halved"></i></span>
                         </div>
                     </div>

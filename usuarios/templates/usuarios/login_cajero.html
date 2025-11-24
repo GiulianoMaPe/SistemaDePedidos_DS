@@ -7,12 +7,11 @@
     <title>Sistema de Caja - Cocos Burger</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ... (Tus estilos existentes se mantienen igual) ... */
+        /* ... (Estilos CSS originales se mantienen igual) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { height: 100vh; width: 100vw; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; overflow: hidden; }
         .workspace { height: 100vh; width: 100vw; display: grid; grid-template-columns: 1fr 1fr; background: linear-gradient(135deg, #1a0505 0%, #2d0a0a 100%); }
 
-        /* ... (Estilos del panel izquierdo y derecho) ... */
         .left-panel { display: flex; flex-direction: column; justify-content: center; padding: 4vh 5vw; background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(185, 28, 28, 0.08) 100%); border-right: 1px solid rgba(255, 255, 255, 0.05); position: relative; overflow: hidden; }
         .left-panel::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(220, 38, 38, 0.04) 2px, transparent 2px); background-size: 50px 50px; animation: gridMove 20s linear infinite; }
         @keyframes gridMove { 0% { transform: translate(0, 0); } 100% { transform: translate(50px, 50px); } }
@@ -32,7 +31,8 @@
         .instructions-title { display: flex; align-items: center; gap: 0.5vw; font-weight: 700; font-size: clamp(12px, 0.85vw, 15px); margin-bottom: 1.5vh; color: #4ade80; }
         .instructions ul { list-style: none; padding-left: 0; }
         .instructions li { padding: 0.8vh 0; padding-left: 1.5vw; position: relative; font-size: clamp(11px, 0.8vw, 14px); line-height: 1.5; color: rgba(255, 255, 255, 0.75); }
-        .instructions li::before { content: '✓'; position: absolute; left: 0; color: #4ade80; font-weight: bold; }
+        /* Usando iconos FontAwesome en lugar de emojis en CSS */
+        .instructions li::before { content: '\f00c'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; left: 0; color: #4ade80; }
 
         .right-panel { display: flex; align-items: center; justify-content: center; padding: 4vh 5vw; background: #0a0a0a; }
         .login-container { width: 100%; max-width: 500px; }
@@ -99,13 +99,13 @@
                 </div>
                 <div class="shift-info">
                     <div class="shift-title">Información del Turno</div>
-                    <div class="shift-detail"><span class="shift-icon">📅</span><span id="current-date">Cargando...</span></div>
-                    <div class="shift-detail"><span class="shift-icon">⏰</span><span id="current-time">--:--</span></div>
-                    <div class="shift-detail"><span class="shift-icon">🏪</span><span>Sucursal Principal</span></div>
-                    <div class="shift-detail"><span class="shift-icon">💼</span><span>Turno Mañana</span></div>
+                    <div class="shift-detail"><span class="shift-icon"><i class="fa-regular fa-calendar"></i></span><span id="current-date">Cargando...</span></div>
+                    <div class="shift-detail"><span class="shift-icon"><i class="fa-regular fa-clock"></i></span><span id="current-time">--:--</span></div>
+                    <div class="shift-detail"><span class="shift-icon"><i class="fa-solid fa-store"></i></span><span>Sucursal Principal</span></div>
+                    <div class="shift-detail"><span class="shift-icon"><i class="fa-solid fa-briefcase"></i></span><span>Turno Mañana</span></div>
                 </div>
                 <div class="instructions">
-                    <div class="instructions-title"><span>💡</span><span>Antes de Iniciar</span></div>
+                    <div class="instructions-title"><span><i class="fa-regular fa-lightbulb"></i></span><span>Antes de Iniciar</span></div>
                     <ul>
                         <li>Verifica que la caja registradora esté lista</li>
                         <li>Confirma el fondo de efectivo inicial</li>
@@ -121,12 +121,24 @@
                     <p class="session-subtitle">Ingresa tus credenciales de empleado para comenzar tu turno de trabajo</p>
                     <div class="employee-badge"><span class="live-indicator"></span><span>SISTEMA ACTIVO - ACCESO CAJERO</span></div>
                 </div>
+
+                {% if messages %}
+                <div style="margin-bottom: 20px;">
+                    {% for message in messages %}
+                    <div style="background: rgba(220, 38, 38, 0.2); border: 1px solid #dc2626; color: #ffcccc; padding: 10px; border-radius: 8px; font-size: 0.9em; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
                 <form method="post">
                     {% csrf_token %}
                     <div class="form-field">
-                        <label class="field-label" for="usuario">Usuario de Empleado</label>
+                        <label class="field-label" for="username">Usuario de Empleado</label>
                         <div class="input-group">
-                            <input type="text" id="usuario" name="usuario" placeholder="Ej: juan.perez" required autocomplete="username" autofocus>
+                            <input type="text" id="username" name="username" placeholder="Ej: juan.perez" required autocomplete="username" autofocus>
                             <span class="field-icon"><i class="fa-solid fa-user"></i></span>
                         </div>
                     </div>
