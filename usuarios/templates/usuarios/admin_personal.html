@@ -87,9 +87,73 @@
         .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
         .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 1em; }
         .form-group select:focus, .form-group input:focus { outline: none; border-color: #334155; }
+
+        /* Estilos específicos para el Modal de Eliminación */
+        .modal-body-confirm { text-align: center; padding: 10px 0; }
+        .warning-icon { font-size: 4em; color: #dc3545; margin-bottom: 15px; }
+        .confirm-text { font-size: 1.1em; color: #555; margin-bottom: 25px; }
+
+        .confirm-actions { display: flex; gap: 15px; justify-content: center; }
+        .btn-modal-action { padding: 10px 25px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1em; transition: 0.2s; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-cancel { background-color: #e2e8f0; color: #475569; }
+        .btn-cancel:hover { background-color: #cbd5e1; }
+        .btn-confirm-delete { background-color: #dc3545; color: white; }
+        .btn-confirm-delete:hover { background-color: #b91c1c; }
+
+        /* --- ESTILOS PARA MENSAJES FLOTANTES (TOASTS) --- */
+        .messages-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast-message {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 300px;
+            animation: slideIn 0.3s ease-out;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .toast-message.success { background-color: #10b981; border-left: 5px solid #065f46; }
+        .toast-message.error { background-color: #ef4444; border-left: 5px solid #7f1d1d; }
+        .toast-message.warning { background-color: #f59e0b; border-left: 5px solid #78350f; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
+
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="toast-message {{ message.tags }}">
+            {% if 'success' in message.tags %}
+                <i class="fa-solid fa-check-circle"></i>
+            {% elif 'error' in message.tags %}
+                <i class="fa-solid fa-circle-exclamation"></i>
+            {% else %}
+                <i class="fa-solid fa-info-circle"></i>
+            {% endif %}
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <div class="nav-header">
         <h2><i class="fa-solid fa-users-gear"></i> Administración de Personal</h2>
@@ -144,11 +208,10 @@
                                         )">
                                     <i class="fa-solid fa-pen"></i>
                                 </button>
-                                <a href="{% url 'eliminar-cajero' admin.id %}"
-                                   class="btn-icon btn-delete"
-                                   onclick="return confirm('¿Eliminar administrador {{ admin.username }}?');">
+                                <button class="btn-icon btn-delete"
+                                        onclick="abrirModalEliminar('{{ admin.id }}', '{{ admin.username }}')">
                                    <i class="fa-solid fa-trash"></i>
-                                </a>
+                                </button>
                             </td>
                         </tr>
                         {% empty %}
@@ -195,11 +258,10 @@
                                         )">
                                     <i class="fa-solid fa-pen"></i>
                                 </button>
-                                <a href="{% url 'eliminar-cajero' cajero.id %}"
-                                   class="btn-icon btn-delete"
-                                   onclick="return confirm('¿Eliminar cajero {{ cajero.username }}?');">
+                                <button class="btn-icon btn-delete"
+                                        onclick="abrirModalEliminar('{{ cajero.id }}', '{{ cajero.username }}')">
                                    <i class="fa-solid fa-trash"></i>
-                                </a>
+                                </button>
                             </td>
                         </tr>
                         {% empty %}
@@ -293,7 +355,26 @@
         </div>
     </div>
 
+    <div id="modalEliminar" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+                <h3>Confirmar Eliminación</h3>
+                <button class="close-icon" onclick="cerrarModal('modalEliminar')"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body-confirm">
+                <div class="warning-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <p class="confirm-text">¿Estás seguro que deseas eliminar al usuario <strong id="delete_username_display"></strong>? Esta acción no se puede deshacer.</p>
+
+                <div class="confirm-actions">
+                    <button class="btn-modal-action btn-cancel" onclick="cerrarModal('modalEliminar')">Cancelar</button>
+                    <a href="#" id="btnConfirmarEliminar" class="btn-modal-action btn-confirm-delete">Sí, Eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Lógica para Modales
         function cerrarModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
 
         function abrirModalAgregar(rolPreseleccionado) {
@@ -315,11 +396,38 @@
             document.getElementById('modalModificar').style.display = 'flex';
         }
 
+        // NUEVA FUNCIÓN: Abrir Modal Eliminar
+        function abrirModalEliminar(id, username) {
+            document.getElementById('delete_username_display').textContent = username;
+
+            // Usamos un placeholder '0' en la URL de Django y lo reemplazamos con JS
+            let urlTemplate = "{% url 'eliminar-cajero' 0 %}";
+            document.getElementById('btnConfirmarEliminar').href = urlTemplate.replace('0', id);
+
+            document.getElementById('modalEliminar').style.display = 'flex';
+        }
+
         window.onclick = function(event) {
             if (event.target.classList.contains('modal-overlay')) {
                 event.target.style.display = 'none';
             }
         }
+
+        // --- LÓGICA PARA AUTO-OCULTAR MENSAJES ---
+        document.addEventListener("DOMContentLoaded", function() {
+            const toasts = document.querySelectorAll('.toast-message');
+
+            if (toasts.length > 0) {
+                setTimeout(function() {
+                    toasts.forEach(toast => {
+                        // Inicia desvanecimiento
+                        toast.style.opacity = '0';
+                        // Elimina del DOM tras la animación CSS (0.5s)
+                        setTimeout(() => toast.remove(), 500);
+                    });
+                }, 3000);
+            }
+        });
     </script>
 </body>
 </html>

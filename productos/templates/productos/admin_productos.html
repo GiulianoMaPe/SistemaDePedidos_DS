@@ -94,6 +94,18 @@
         .empty-state { text-align: center; padding: 30px; color: #888; }
         .close-icon { background: none; border: none; font-size: 1.5em; color: #999; cursor: pointer; }
         .close-icon:hover { color: #333; }
+
+        /* --- Estilos específicos para los Modales de Eliminación --- */
+        .modal-body-confirm { text-align: center; padding: 10px 0; }
+        .warning-icon { font-size: 4em; color: #dc3545; margin-bottom: 15px; }
+        .confirm-text { font-size: 1.1em; color: #555; margin-bottom: 25px; }
+
+        .confirm-actions { display: flex; gap: 15px; justify-content: center; }
+        .btn-modal-action { padding: 10px 25px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1em; transition: 0.2s; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-cancel { background-color: #e2e8f0; color: #475569; }
+        .btn-cancel:hover { background-color: #cbd5e1; }
+        .btn-confirm-delete { background-color: #dc3545; color: white; }
+        .btn-confirm-delete:hover { background-color: #b91c1c; }
     </style>
 </head>
 <body>
@@ -165,9 +177,9 @@
                                     <i class="fa-solid fa-pen"></i>
                                 </button>
 
-                                <a href="{% url 'eliminar-producto' producto.id %}" class="btn-icon btn-delete" onclick="return confirm('¿Eliminar producto?');">
+                                <button class="btn-icon btn-delete" onclick="abrirModalEliminarProducto('{{ producto.id }}', '{{ producto.nombre }}')">
                                     <i class="fa-solid fa-trash"></i>
-                                </a>
+                                </button>
                             </td>
                         </tr>
                         {% empty %}
@@ -204,9 +216,10 @@
                                     onclick="abrirModalEditar('{{ insumo.id }}', '{{ insumo.nombre }}', '{{ insumo.stock }}', '{{ insumo.precio }}')">
                                     <i class="fa-solid fa-pen"></i>
                                 </button>
-                                <a href="{% url 'eliminar-insumo' insumo.id %}" class="btn-icon btn-delete" onclick="return confirm('¿Eliminar insumo?');">
+
+                                <button class="btn-icon btn-delete" onclick="abrirModalEliminarInsumo('{{ insumo.id }}', '{{ insumo.nombre }}')">
                                     <i class="fa-solid fa-trash"></i>
-                                </a>
+                                </button>
                             </td>
                         </tr>
                         {% empty %}
@@ -381,6 +394,42 @@
         </div>
     </div>
 
+    <div id="modalEliminarProducto" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="section-header" style="border-bottom: none; padding-bottom: 0;">
+                <h3>Confirmar Eliminación</h3>
+                <button class="close-icon" onclick="cerrarModal('modalEliminarProducto')"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body-confirm">
+                <div class="warning-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <p class="confirm-text">¿Estás seguro que deseas eliminar el producto <strong id="del_prod_nombre"></strong>?</p>
+
+                <div class="confirm-actions">
+                    <button class="btn-modal-action btn-cancel" onclick="cerrarModal('modalEliminarProducto')">Cancelar</button>
+                    <a href="#" id="btnConfirmarEliminarProducto" class="btn-modal-action btn-confirm-delete">Sí, Eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalEliminarInsumo" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="section-header" style="border-bottom: none; padding-bottom: 0;">
+                <h3>Confirmar Eliminación</h3>
+                <button class="close-icon" onclick="cerrarModal('modalEliminarInsumo')"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body-confirm">
+                <div class="warning-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <p class="confirm-text">¿Estás seguro que deseas eliminar el insumo <strong id="del_insumo_nombre"></strong>?</p>
+
+                <div class="confirm-actions">
+                    <button class="btn-modal-action btn-cancel" onclick="cerrarModal('modalEliminarInsumo')">Cancelar</button>
+                    <a href="#" id="btnConfirmarEliminarInsumo" class="btn-modal-action btn-confirm-delete">Sí, Eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
         function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
@@ -415,6 +464,22 @@
             }
 
             abrirModal('modalEditarProducto');
+        }
+
+        // Eliminar Producto
+        function abrirModalEliminarProducto(id, nombre) {
+            document.getElementById('del_prod_nombre').textContent = nombre;
+            let urlTemplate = "{% url 'eliminar-producto' 0 %}";
+            document.getElementById('btnConfirmarEliminarProducto').href = urlTemplate.replace('0', id);
+            abrirModal('modalEliminarProducto');
+        }
+
+        // Eliminar Insumo
+        function abrirModalEliminarInsumo(id, nombre) {
+            document.getElementById('del_insumo_nombre').textContent = nombre;
+            let urlTemplate = "{% url 'eliminar-insumo' 0 %}";
+            document.getElementById('btnConfirmarEliminarInsumo').href = urlTemplate.replace('0', id);
+            abrirModal('modalEliminarInsumo');
         }
 
         function validarPositivo(input) { if (input.value < 0) input.value = 0; }

@@ -12,9 +12,6 @@ GO
 ------------------------------------------------------------------------------------------------------------------------
 Exportar datos (en cmd con venv activado):
 ------------------------------------------------------------------------------------------------------------------------
-python manage.py dumpdata --exclude auth.permission --exclude contenttypes --exclude sessions --indent 2 > datos_backup.json
-si les sale en UTF-16 usen este
-
 python manage.py dumpdata --exclude auth.permission --exclude contenttypes --exclude sessions --indent 2 | Out-File -Encoding utf8 datos_backup.json
 
 ------------------------------------------------------------------------------------------------------------------------

@@ -1,273 +1,218 @@
-
-<!DOCTYPE html>
 {% load pedidos_extras %}
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle de Venta #{{ venta.id }} - Coco's Burger</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
+        /* --- Estilos Base del Panel Admin --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html {
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f5f5;
+            color: #333;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Barra de navegación */
-        .nav-bar {
-            background-color: #722f37;
+        /* Header Fijo */
+        .nav-header {
+            background-color: #1e293b;
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .nav-bar h1 {
             color: white;
-            font-size: 1.5em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+            z-index: 100;
         }
-        .btn-volver {
-            padding: 10px 20px;
-            background-color: #6c757d;
-            color: white;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        .btn-volver:hover {
-            background-color: #5a6268;
+        .nav-header h2 { margin: 0; font-size: 1.5em; display: flex; align-items: center; gap: 10px; }
+
+        .btn-nav { background-color: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-size: 0.9em; transition: background 0.3s; margin-left: 5px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-nav:hover { background-color: rgba(255,255,255,0.2); }
+        .btn-nav.active { background-color: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.3); }
+
+        /* Área de Contenido */
+        .main-content-scroll {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 30px 20px;
         }
 
-        /* Contenedor principal */
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
+        .container { max-width: 800px; margin: 0 auto; }
 
-        /* Tarjeta principal */
-        .venta-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
+        /* Tarjeta de Detalle */
+        .card { background: white; border-radius: 8px; padding: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; margin-top: 20px; }
 
-        /* Header de la tarjeta */
+        /* --- HEADER DE LA VENTA MODIFICADO --- */
         .venta-header {
-            background: linear-gradient(135deg, #722f37 0%, #a04450 100%);
+            background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
             color: white;
-            padding: 25px;
-            text-align: center;
-        }
-        .venta-header h2 {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-        .venta-header .fecha {
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-
-        /* Info del cliente */
-        .info-section {
-            padding: 20px 25px;
-            border-bottom: 1px solid #eee;
-        }
-        .info-section h3 {
-            color: #722f37;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-        }
-        .info-label {
-            color: #666;
-        }
-        .info-value {
-            font-weight: bold;
-            color: #333;
-        }
-
-        /* Tabla de productos */
-        .productos-section {
-            padding: 20px 25px;
-        }
-        .productos-section h3 {
-            color: #722f37;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        .tabla-productos {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .tabla-productos th,
-        .tabla-productos td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-        .tabla-productos th {
-            background-color: #f8f9fa;
-            color: #333;
-            font-weight: bold;
-        }
-        .personalizacion {
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        /* Total */
-        .total-section {
-            background-color: #f8f9fa;
-            padding: 20px 25px;
+            padding: 25px 30px;
+            /* Flexbox para alinear Título a la izq y Botón a la derecha */
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .total-section h3 {
-            color: #333;
-            font-size: 1.3em;
-        }
-        .total-monto {
-            font-size: 2em;
-            font-weight: bold;
-            color: #28a745;
-        }
 
-        /* Botón imprimir */
-        .acciones-section {
-            padding: 20px 25px;
-            text-align: center;
-            border-top: 1px solid #eee;
+        .header-text {
+            text-align: left;
         }
-        .btn-imprimir {
-            padding: 12px 30px;
-            background-color: #17a2b8;
+        .header-text h2 { margin: 0; font-size: 2em; margin-bottom: 5px; line-height: 1; }
+        .header-text .fecha { opacity: 0.8; font-size: 0.95em; margin: 0; }
+
+        /* Botón dentro del header */
+        .btn-back-header {
+            background-color: rgba(255, 255, 255, 0.15);
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
         }
-        .btn-imprimir:hover {
-            background-color: #138496;
+        .btn-back-header:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
         }
 
-        /* Estilos para impresión */
-        @media print {
-            .nav-bar, .btn-volver, .acciones-section {
-                display: none;
-            }
-            body {
-                background: white;
-            }
-            .container {
-                margin: 0;
-                padding: 0;
-            }
-            .venta-card {
-                box-shadow: none;
-            }
+        /* Resto de secciones */
+        .info-section { padding: 25px; border-bottom: 1px solid #f1f5f9; }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #64748b; font-weight: 600; }
+        .info-value { font-weight: bold; color: #1e293b; }
+
+        .productos-section { padding: 25px; }
+        .productos-section h3 { color: #334155; margin-bottom: 15px; font-size: 1.2em; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background-color: #f8fafc; color: #64748b; padding: 12px; text-align: left; font-weight: 600; font-size: 0.9em; text-transform: uppercase; }
+        td { padding: 15px 12px; border-bottom: 1px solid #f1f5f9; color: #333; vertical-align: top; }
+        .monto { font-weight: bold; color: #10b981; text-align: right; }
+
+        .total-section {
+            background-color: #f8fafc; padding: 20px 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid #e2e8f0;
         }
+        .total-label { font-size: 1.3em; font-weight: bold; color: #334155; }
+        .total-value { font-size: 2em; font-weight: bold; color: #10b981; }
     </style>
 </head>
 <body>
-    <!-- Barra de navegación -->
-    <div class="nav-bar">
-        <h1>🧾 Detalle de Venta</h1>
-        <a href="{% url 'historial-ventas' %}" class="btn-volver">🔙 Volver al Historial</a>
-    </div>
 
-    <div class="container">
-        <div class="venta-card">
-            <!-- Header -->
-            <div class="venta-header">
-                <h2>Venta #{{ venta.id }}</h2>
-                <p class="fecha">{{ venta.fecha|date:"d/m/Y - H:i:s" }}</p>
-            </div>
-
-            <!-- Info del cliente -->
-            <div class="info-section">
-                <h3>📋 Información de la Venta</h3>
-                <div class="info-row">
-                    <span class="info-label">Cliente:</span>
-                    <span class="info-value">{{ venta.cliente }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Estado:</span>
-                    <span class="info-value" style="color: #28a745;">{{ venta.estado }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Fecha de Registro:</span>
-                    <span class="info-value">{{ venta.fecha|date:"d/m/Y" }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Hora:</span>
-                    <span class="info-value">{{ venta.fecha|time:"H:i:s" }}</span>
-                </div>
-            </div>
-
-            <!-- Productos -->
-            <div class="productos-section">
-                <h3>🍔 Productos</h3>
-                <table class="tabla-productos">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Cantidad</th>
-                            <th>Precio Unit.</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for detalle in detalles %}
-                        <tr>
-                            <td>
-                                {{ detalle.producto.nombre }}
-                                {% if detalle.personalizacion %}
-                                <div class="personalizacion">
-                                    <strong>Extras:</strong> {{ detalle.personalizacion }}
-                                </div>
-                                {% endif %}
-                            </td>
-                            <td>{{ detalle.cantidad }}</td>
-                            <td>S/ {{ detalle.producto.precio|floatformat:2 }}</td>
-                            <td>S/ {{ detalle.producto.precio|floatformat:2 }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" style="text-align: center; color: #666;">
-                                No hay detalles disponibles
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Total -->
-            <div class="total-section">
-                <h3>TOTAL PAGADO:</h3>
-                <span class="total-monto">S/ {{ venta.total|floatformat:2 }}</span>
-            </div>
-
-            <!-- Acciones -->
-            <div class="acciones-section">
-                <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir Comprobante</button>
-            </div>
+    <div class="nav-header">
+        <h2><i class="fa-solid fa-file-invoice"></i> Detalle de Venta</h2>
+        <div>
+            <a href="{% url 'panel-pedidos-admin' %}" class="btn-nav"><i class="fa-solid fa-clipboard-list"></i> Pedidos</a>
+            <a href="{% url 'admin-productos' %}" class="btn-nav"><i class="fa-solid fa-burger"></i> Menú</a>
+            <a href="{% url 'admin-personal' %}" class="btn-nav"><i class="fa-solid fa-users"></i> Personal</a>
+            <a href="{% url 'historial-ventas' %}" class="btn-nav active"><i class="fa-solid fa-chart-pie"></i> Historial</a>
+            <a href="{% url 'inicio' %}" class="btn-nav" style="background-color: #dc2626; margin-left: 10px;">
+                <i class="fa-solid fa-door-open"></i> Salir
+            </a>
         </div>
     </div>
+
+    <div class="main-content-scroll">
+        <div class="container">
+
+            <div class="card">
+                <div class="venta-header">
+                    <div class="header-text">
+                        <h2>Venta #{{ venta.id }}</h2>
+                        <p class="fecha"><i class="fa-regular fa-clock"></i> {{ venta.fecha|date:"d/m/Y - H:i" }}</p>
+                    </div>
+
+                    <a href="{% url 'historial-ventas' %}" class="btn-back-header">
+                        <i class="fa-solid fa-arrow-left"></i> Volver al Historial
+                    </a>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-row">
+                        <span class="info-label">Cliente</span>
+                        <span class="info-value">{{ venta.cliente }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Estado</span>
+                        <span class="info-value">
+                            {% if venta.estado == 'Entregado' %}
+                                <span style="color: #10b981;"><i class="fa-solid fa-check-circle"></i> Entregado</span>
+                            {% else %}
+                                <span>{{ venta.estado }}</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Atendido por</span>
+                        <span class="info-value">
+                            {% if venta.usuario %}
+                                <i class="fa-solid fa-user-tag"></i> {{ venta.usuario.username }}
+                            {% else %}
+                                <i>Sistema</i>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="productos-section">
+                    <h3><i class="fa-solid fa-basket-shopping"></i> Productos Vendidos</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th style="text-align: center;">Cant.</th>
+                                <th style="text-align: right;">P. Unit</th>
+                                <th style="text-align: right;">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detalle in detalles %}
+                            <tr>
+                                <td>
+                                    <div style="font-weight: 600; color: #1e293b;">{{ detalle.producto.nombre }}</div>
+                                    {% if detalle.personalizacion %}
+                                    <div style="font-size:0.85em; color:#64748b; margin-top:4px; font-style: italic;">
+                                        <i class="fa-solid fa-list-ul" style="font-size: 0.8em;"></i> {{ detalle.personalizacion }}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center; font-weight: bold;">{{ detalle.cantidad }}</td>
+                                <td style="text-align: right; color: #64748b;">S/ {{ detalle.producto.precio|floatformat:2 }}</td>
+                                <td class="monto">S/ {{ detalle.producto.precio|multiply:detalle.cantidad|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">
+                                    No hay detalles disponibles
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="total-section">
+                    <span class="total-label">TOTAL PAGADO</span>
+                    <span class="total-value">S/ {{ venta.total|floatformat:2 }}</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 </body>
 </html>
