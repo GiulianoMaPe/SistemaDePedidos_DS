@@ -4,7 +4,7 @@
   "pk": 3,
   "fields": {
     "password": "pbkdf2_sha256$1000000$4NmpZyORbFFbLHcoetlagg$D3OwGXb5vLQ+1UK9qOq7ECcR/mK/Niey1x68R8ZkN3A=",
-    "last_login": "2025-11-24T06:49:30.720Z",
+    "last_login": "2025-12-08T06:22:46.514Z",
     "is_superuser": true,
     "username": "a",
     "first_name": "Super",
@@ -21,8 +21,8 @@
   "model": "auth.user",
   "pk": 13,
   "fields": {
-    "password": "pbkdf2_sha256$1000000$77iPtMph1SQrUciCkEzbsU$TRRe5oosgUbV/SGP/okO0kTSdoiw8Lr2vF/UMnykSXQ=",
-    "last_login": "2025-11-24T06:41:54.007Z",
+    "password": "pbkdf2_sha256$1000000$ORS0lWm79RJT83RKXHAdkv$fgAfBT/wtT1HVAYNGNJQrEZq9SqqVdgfQ4/p46MX1F4=",
+    "last_login": "2025-12-08T06:22:41.181Z",
     "is_superuser": false,
     "username": "Cajero1",
     "first_name": "Sin",
@@ -40,8 +40,9 @@
   "pk": 8,
   "fields": {
     "nombre": "Pan de Hamburguesa",
-    "stock": 0,
-    "precio": "1.00"
+    "stock": 98,
+    "precio": "1.00",
+    "es_extra": true
   }
 },
 {
@@ -49,8 +50,9 @@
   "pk": 9,
   "fields": {
     "nombre": "Hamburguesa de Carne",
-    "stock": 100,
-    "precio": "3.00"
+    "stock": 98,
+    "precio": "3.00",
+    "es_extra": true
   }
 },
 {
@@ -58,8 +60,9 @@
   "pk": 10,
   "fields": {
     "nombre": "Hamburguesa de Pollo",
-    "stock": 0,
-    "precio": "3.00"
+    "stock": 100,
+    "precio": "3.00",
+    "es_extra": true
   }
 },
 {
@@ -67,8 +70,9 @@
   "pk": 11,
   "fields": {
     "nombre": "Lechuga",
-    "stock": 0,
-    "precio": "2.00"
+    "stock": 98,
+    "precio": "2.00",
+    "es_extra": true
   }
 },
 {
@@ -76,8 +80,9 @@
   "pk": 12,
   "fields": {
     "nombre": "Tomate",
-    "stock": 0,
-    "precio": "2.00"
+    "stock": 98,
+    "precio": "2.00",
+    "es_extra": true
   }
 },
 {
@@ -85,8 +90,9 @@
   "pk": 13,
   "fields": {
     "nombre": "Queso Cheddar",
-    "stock": 0,
-    "precio": "3.00"
+    "stock": 100,
+    "precio": "3.00",
+    "es_extra": true
   }
 },
 {
@@ -94,8 +100,9 @@
   "pk": 14,
   "fields": {
     "nombre": "Cebolla",
-    "stock": 0,
-    "precio": "1.50"
+    "stock": 100,
+    "precio": "1.50",
+    "es_extra": true
   }
 },
 {
@@ -103,8 +110,9 @@
   "pk": 16,
   "fields": {
     "nombre": "Tocino",
-    "stock": 0,
-    "precio": "4.00"
+    "stock": 100,
+    "precio": "4.00",
+    "es_extra": true
   }
 },
 {
@@ -112,8 +120,9 @@
   "pk": 17,
   "fields": {
     "nombre": "Pepinillo",
-    "stock": 0,
-    "precio": "2.00"
+    "stock": 100,
+    "precio": "2.00",
+    "es_extra": true
   }
 },
 {
@@ -122,7 +131,28 @@
   "fields": {
     "nombre": "Salsa BBQ",
     "stock": 100,
-    "precio": "4.00"
+    "precio": "4.00",
+    "es_extra": true
+  }
+},
+{
+  "model": "productos.insumo",
+  "pk": 19,
+  "fields": {
+    "nombre": "Inca Kola 300ml",
+    "stock": 100,
+    "precio": "4.00",
+    "es_extra": false
+  }
+},
+{
+  "model": "productos.insumo",
+  "pk": 20,
+  "fields": {
+    "nombre": "Coca Cola 300ml",
+    "stock": 100,
+    "precio": "4.00",
+    "es_extra": false
   }
 },
 {
@@ -150,7 +180,7 @@
     "descripcion": "",
     "precio": "18.00",
     "categoria": "Hamburguesas",
-    "imagen": "productos/Sin_tÝtulo.jpg",
+    "imagen": "productos/bbq.png",
     "insumos": [
       9,
       11,
@@ -158,6 +188,34 @@
       18,
       16,
       12
+    ]
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 12,
+  "fields": {
+    "nombre": "Inca Kola 300ml",
+    "descripcion": "",
+    "precio": "4.00",
+    "categoria": "Bebidas",
+    "imagen": "productos/inca.webp",
+    "insumos": [
+      19
+    ]
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 13,
+  "fields": {
+    "nombre": "Coca Cola 300ml",
+    "descripcion": "",
+    "precio": "4.00",
+    "categoria": "Bebidas",
+    "imagen": "productos/Coca-cola-300-ml.jpg",
+    "insumos": [
+      20
     ]
   }
 },
@@ -461,6 +519,45 @@
   }
 },
 {
+  "model": "pedidos.pedido",
+  "pk": 25,
+  "fields": {
+    "fecha": "2025-12-08T04:22:30.227Z",
+    "total": "30.00",
+    "estado": "Entregado",
+    "cliente": "yo",
+    "metodo_pago": "Efectivo",
+    "usuario": 13,
+    "finalizado": true
+  }
+},
+{
+  "model": "pedidos.pedido",
+  "pk": 26,
+  "fields": {
+    "fecha": "2025-12-08T04:37:13.446Z",
+    "total": "54.00",
+    "estado": "Cancelado",
+    "cliente": "",
+    "metodo_pago": "Efectivo",
+    "usuario": 13,
+    "finalizado": true
+  }
+},
+{
+  "model": "pedidos.pedido",
+  "pk": 27,
+  "fields": {
+    "fecha": "2025-12-08T05:03:20.634Z",
+    "total": "31.00",
+    "estado": "Entregado",
+    "cliente": "",
+    "metodo_pago": "Efectivo",
+    "usuario": 13,
+    "finalizado": true
+  }
+},
+{
   "model": "pedidos.detallepedido",
   "pk": 3,
   "fields": {
@@ -746,6 +843,76 @@
   "fields": {
     "pedido": 24,
     "producto": 11,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 32,
+  "fields": {
+    "pedido": 25,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 33,
+  "fields": {
+    "pedido": 25,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 34,
+  "fields": {
+    "pedido": 26,
+    "producto": 11,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 35,
+  "fields": {
+    "pedido": 26,
+    "producto": 11,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 36,
+  "fields": {
+    "pedido": 26,
+    "producto": 11,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 37,
+  "fields": {
+    "pedido": 27,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": "+ Pan de Hamburguesa (S/1), Sin Pan de Hamburguesa"
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 38,
+  "fields": {
+    "pedido": 27,
+    "producto": 7,
     "cantidad": 1,
     "personalizacion": ""
   }
