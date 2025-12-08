@@ -1,10 +1,10 @@
-﻿[
+[
 {
   "model": "auth.user",
   "pk": 3,
   "fields": {
     "password": "pbkdf2_sha256$1000000$4NmpZyORbFFbLHcoetlagg$D3OwGXb5vLQ+1UK9qOq7ECcR/mK/Niey1x68R8ZkN3A=",
-    "last_login": "2025-12-08T06:22:46.514Z",
+    "last_login": "2025-12-08T21:25:57.220Z",
     "is_superuser": true,
     "username": "a",
     "first_name": "Super",
@@ -22,7 +22,7 @@
   "pk": 13,
   "fields": {
     "password": "pbkdf2_sha256$1000000$ORS0lWm79RJT83RKXHAdkv$fgAfBT/wtT1HVAYNGNJQrEZq9SqqVdgfQ4/p46MX1F4=",
-    "last_login": "2025-12-08T06:22:41.181Z",
+    "last_login": "2025-12-08T21:25:35.634Z",
     "is_superuser": false,
     "username": "Cajero1",
     "first_name": "Sin",
@@ -36,11 +36,29 @@
   }
 },
 {
+  "model": "auth.user",
+  "pk": 14,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$K12yAzWKgx2ZXajM1RezeR$Ns5yu4HsXw8GgelufOa67UfiVl/zF9HrqC5Cc5r+SUo=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "nuevo",
+    "first_name": "PEPE",
+    "last_name": "Nueva",
+    "email": "sinExperiencia@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-12-08T20:02:35.795Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
   "model": "productos.insumo",
   "pk": 8,
   "fields": {
     "nombre": "Pan de Hamburguesa",
-    "stock": 98,
+    "stock": 95,
     "precio": "1.00",
     "es_extra": true
   }
@@ -50,7 +68,7 @@
   "pk": 9,
   "fields": {
     "nombre": "Hamburguesa de Carne",
-    "stock": 98,
+    "stock": 95,
     "precio": "3.00",
     "es_extra": true
   }
@@ -60,7 +78,7 @@
   "pk": 10,
   "fields": {
     "nombre": "Hamburguesa de Pollo",
-    "stock": 100,
+    "stock": 99,
     "precio": "3.00",
     "es_extra": true
   }
@@ -70,7 +88,7 @@
   "pk": 11,
   "fields": {
     "nombre": "Lechuga",
-    "stock": 98,
+    "stock": 95,
     "precio": "2.00",
     "es_extra": true
   }
@@ -80,7 +98,7 @@
   "pk": 12,
   "fields": {
     "nombre": "Tomate",
-    "stock": 98,
+    "stock": 95,
     "precio": "2.00",
     "es_extra": true
   }
@@ -100,7 +118,7 @@
   "pk": 14,
   "fields": {
     "nombre": "Cebolla",
-    "stock": 100,
+    "stock": 99,
     "precio": "1.50",
     "es_extra": true
   }
@@ -110,7 +128,7 @@
   "pk": 16,
   "fields": {
     "nombre": "Tocino",
-    "stock": 100,
+    "stock": 97,
     "precio": "4.00",
     "es_extra": true
   }
@@ -120,7 +138,7 @@
   "pk": 17,
   "fields": {
     "nombre": "Pepinillo",
-    "stock": 100,
+    "stock": 99,
     "precio": "2.00",
     "es_extra": true
   }
@@ -130,7 +148,7 @@
   "pk": 18,
   "fields": {
     "nombre": "Salsa BBQ",
-    "stock": 100,
+    "stock": 98,
     "precio": "4.00",
     "es_extra": true
   }
@@ -216,6 +234,23 @@
     "imagen": "productos/Coca-cola-300-ml.jpg",
     "insumos": [
       20
+    ]
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 14,
+  "fields": {
+    "nombre": "CheeseBurger",
+    "descripcion": "",
+    "precio": "16.00",
+    "categoria": "Hamburguesas",
+    "imagen": "productos/hd-cheeseburger-hamburger-homemade-png-image-7040816948669806le3yqfrip.png",
+    "insumos": [
+      9,
+      11,
+      8,
+      13
     ]
   }
 },
@@ -555,6 +590,32 @@
     "metodo_pago": "Efectivo",
     "usuario": 13,
     "finalizado": true
+  }
+},
+{
+  "model": "pedidos.pedido",
+  "pk": 28,
+  "fields": {
+    "fecha": "2025-12-08T19:51:35.767Z",
+    "total": "33.00",
+    "estado": "En preparaci¾n",
+    "cliente": "Juan",
+    "metodo_pago": "Efectivo",
+    "usuario": 13,
+    "finalizado": false
+  }
+},
+{
+  "model": "pedidos.pedido",
+  "pk": 29,
+  "fields": {
+    "fecha": "2025-12-08T19:55:26.756Z",
+    "total": "28.50",
+    "estado": "Listo para entregar",
+    "cliente": "Andres",
+    "metodo_pago": "Tarjeta",
+    "usuario": 13,
+    "finalizado": false
   }
 },
 {
@@ -915,6 +976,36 @@
     "producto": 7,
     "cantidad": 1,
     "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 39,
+  "fields": {
+    "pedido": 28,
+    "producto": 7,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 40,
+  "fields": {
+    "pedido": 28,
+    "producto": 11,
+    "cantidad": 1,
+    "personalizacion": ""
+  }
+},
+{
+  "model": "pedidos.detallepedido",
+  "pk": 41,
+  "fields": {
+    "pedido": 29,
+    "producto": 11,
+    "cantidad": 1,
+    "personalizacion": "+ Cebolla (S/1.5), + Hamburguesa de Pollo (S/3), + Pepinillo (S/2), + Tocino (S/4)"
   }
 }
 ]

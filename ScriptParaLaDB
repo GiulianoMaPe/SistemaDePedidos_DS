@@ -19,13 +19,15 @@ Windows, Mac, Linux (Universal):
 python manage.py dumpdata --exclude auth.permission --exclude contenttypes --exclude sessions --indent 2 > datos_backup.json
 
 Obligatorio cuando estás en PowerShell (Nuestro caso - PyCharm):
-python manage.py dumpdata --exclude auth.permission --exclude contenttypes --exclude sessions --indent 2 | Out-File -Encoding utf8 datos_backup.json
+python manage.py dumpdata --indent 2 --exclude auth.permission --exclude contenttypes --exclude sessions | Set-Content -Encoding Unknown datos_backup.json
 
 ------------------------------------------------------------------------------------------------------------------------
 Importar datos (en la terminal con venv activado):
 ------------------------------------------------------------------------------------------------------------------------
 Crear las tablas vacías primero (Si es que no hubieran):
 python manage.py migrate
+
+python manage.py flush // Solo si ya tienes datos en la bd o dará error la importación
 
 python manage.py loaddata datos_backup.json
 ------------------------------------------------------------------------------------------------------------------------
