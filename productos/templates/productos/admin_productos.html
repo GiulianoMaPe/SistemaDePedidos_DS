@@ -208,12 +208,23 @@
                     <tbody>
                         {% for insumo in insumos %}
                         <tr>
-                            <td>{{ insumo.nombre }}</td>
+                            <td>
+                                {{ insumo.nombre }}
+                                {% if insumo.es_extra %}
+                                    <span style="background:#d1fae5; color:#065f46; padding:2px 6px; border-radius:4px; font-size:0.75em; margin-left:5px;">EXTRA</span>
+                                {% endif %}
+                            </td>
                             <td style="color: #28a745; font-weight: bold;">S/ {{ insumo.precio }}</td>
                             <td><strong>{{ insumo.stock }}</strong></td>
                             <td style="text-align: right;">
                                 <button class="btn-icon btn-edit"
-                                    onclick="abrirModalEditar('{{ insumo.id }}', '{{ insumo.nombre }}', '{{ insumo.stock }}', '{{ insumo.precio }}')">
+                                    onclick="abrirModalEditar(
+                                        '{{ insumo.id }}',
+                                        '{{ insumo.nombre }}',
+                                        '{{ insumo.stock }}',
+                                        '{{ insumo.precio }}',
+                                        '{{ insumo.es_extra|lower }}'
+                                    )">
                                     <i class="fa-solid fa-pen"></i>
                                 </button>
 
@@ -362,6 +373,15 @@
                     <label>Stock Inicial:</label>
                     <input type="number" name="stock" value="0" min="0" oninput="validarPositivo(this)" required>
                 </div>
+                <div class="form-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="es_extra">
+                        ¿Disponible como Extra?
+                    </label>
+                    <small style="color:#666; font-size:0.8em; display:block; margin-top:5px;">
+                        Marcar si el cliente puede pedirlo como agregado (ej: Tocino, Queso).
+                    </small>
+                </div>
                 <button type="submit" class="btn-submit"><i class="fa-solid fa-save"></i> Agregar Insumo</button>
             </form>
         </div>
@@ -388,6 +408,12 @@
                 <div class="form-group">
                     <label>Stock Actual:</label>
                     <input type="number" name="stock" id="edit_insumo_stock" min="0" oninput="validarPositivo(this)" required>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="es_extra" id="edit_insumo_es_extra">
+                        ¿Disponible como Extra?
+                    </label>
                 </div>
                 <button type="submit" class="btn-submit"><i class="fa-solid fa-sync"></i> Actualizar</button>
             </form>
@@ -434,12 +460,17 @@
         function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
         function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Editar Insumo
-        function abrirModalEditar(id, nombre, stock, precio) {
+        // Editar Insumo (FUNCIÓN ACTUALIZADA)
+        function abrirModalEditar(id, nombre, stock, precio, esExtra) {
             document.getElementById('edit_insumo_id').value = id;
             document.getElementById('edit_insumo_nombre').value = nombre;
             document.getElementById('edit_insumo_stock').value = stock;
-            document.getElementById('edit_insumo_precio').value = precio;
+            document.getElementById('edit_insumo_precio').value = precio.replace(',', '.');
+
+            // Lógica para marcar el checkbox según lo que viene de la BD
+            const checkbox = document.getElementById('edit_insumo_es_extra');
+            checkbox.checked = (esExtra === 'true' || esExtra === true);
+
             abrirModal('modalEditarInsumo');
         }
 

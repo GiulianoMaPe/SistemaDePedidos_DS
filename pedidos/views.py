@@ -27,10 +27,9 @@ def registrar_pedido_vista(request):
             try:
                 pedido_json = json.loads(pedido_data)
                 cliente = request.POST.get('cliente', 'Cliente General')
-                # Capturamos el método de pago
                 metodo_pago = request.POST.get('metodo_pago', 'Efectivo')
 
-                # 1. Calcular total
+                # 1. Calcular Total (Precio base + Extras)
                 total = 0
                 for item_id, item in pedido_json.items():
                     precio_base = float(item['precioBase'])
@@ -39,45 +38,89 @@ def registrar_pedido_vista(request):
                     subtotal = (precio_base + precio_extras) * cantidad
                     total += subtotal
 
-                # 2. Crear Pedido con el método de pago
+                # 2. Crear Pedido
                 pedido = Pedido.objects.create(
                     cliente=cliente,
                     total=total,
                     estado='En preparación',
                     metodo_pago=metodo_pago,
-                    usuario=request.user
+                    usuario=request.user if request.user.is_authenticated else None
                 )
 
-                # 3. Crear Detalles
+                # 3. Procesar Detalles y AJUSTAR STOCK
                 for item_id, item in pedido_json.items():
                     producto_id = item['pId']
-                    cantidad = item['cantidad']
+                    cantidad = int(item['cantidad'])
 
-                    lista_extras = [f"{extra['nombre']} (S/{extra['precio']})" for extra in item.get('extras', [])]
-                    texto_personalizacion = ", ".join(lista_extras)
+                    ingredientes_cliente = item.get('ingredientesBase', [])
+                    extras_cliente = item.get('extras', [])
+
+                    # Construimos el texto para el ticket (DetallePedido)
+                    # Mostramos qué se quitó y qué se agregó
+                    textos_detalle = []
+
+                    # a) Extras para el texto
+                    for extra in extras_cliente:
+                        textos_detalle.append(f"+ {extra['nombre']} (S/{extra['precio']})")
+
+                    # b) Ingredientes eliminados para el texto
+                    for ing in ingredientes_cliente:
+                        if ing.get('removed'):
+                            textos_detalle.append(f"Sin {ing['nombre']}")
+
+                    texto_personalizacion = ", ".join(textos_detalle)
 
                     try:
                         producto = Producto.objects.get(id=producto_id)
+
+                        # A) Crear Detalle
                         DetallePedido.objects.create(
                             pedido=pedido,
                             producto=producto,
                             cantidad=cantidad,
                             personalizacion=texto_personalizacion
                         )
-                    except Producto.DoesNotExist:
-                        pass
 
-                messages.success(request, f'Pedido #{pedido.id} registrado exitosamente!')
+                        # B) GESTIÓN DE STOCK
+
+                        # --- 1. Insumos Base ---
+                        insumos_producto = producto.insumos.all()
+
+                        for insumo_db in insumos_producto:
+                            descontar = True
+
+                            # Verificamos si el cliente pidió QUITAR este insumo específico
+                            for ing_json in ingredientes_cliente:
+                                # Comparamos por nombre
+                                if ing_json['nombre'] == insumo_db.nombre and ing_json.get('removed') == True:
+                                    descontar = False
+                                    break
+
+                            if descontar:
+                                insumo_db.stock -= cantidad
+                                insumo_db.save()
+
+                        # --- 2. Insumos Extras ---
+                        for extra_data in extras_cliente:
+                            extra_id = extra_data.get('id')
+                            try:
+                                insumo_extra = Insumo.objects.get(id=extra_id)
+                                insumo_extra.stock -= cantidad
+                                insumo_extra.save()
+                            except Insumo.DoesNotExist:
+                                pass
+
+                    except Producto.DoesNotExist:
+                        continue
+
+                messages.success(request, f'Pedido #{pedido.id} registrado. Inventario actualizado.')
                 return redirect('panel-pedidos')
 
             except Exception as e:
                 messages.error(request, f'Error al procesar: {str(e)}')
-        else:
-            messages.warning(request, 'El carrito está vacío')
 
-    # ... (el resto de la vista GET se mantiene igual) ...
     productos_bd = Producto.objects.prefetch_related('insumos').all()
-    insumos_bd = Insumo.objects.all()
+    insumos_bd = Insumo.objects.filter(es_extra=True).order_by('nombre')
 
     extras_list = []
     for insumo in insumos_bd:

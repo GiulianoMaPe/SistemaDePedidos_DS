@@ -90,6 +90,29 @@
 
         .btn-pay-efectivo:hover i { color: #28a745; }
         .btn-pay-tarjeta:hover i { color: #007bff; }
+
+        .card-agotado {
+        background-color: #f8f9fa; /* Fondo grisáceo */
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 10px;
+        cursor: not-allowed; /* Cursor de prohibido */
+        position: relative;
+        opacity: 0.8;
+        }
+        .badge-agotado {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545; /* Rojo */
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
@@ -105,9 +128,10 @@
 <div class="main-container">
     <div class="menu-container">
         <div class="product-grid">
-            {% for p in productos %}
+    {% for p in productos %}
+        {% if p.tiene_stock_suficiente %}
             <button class="product-card"
-                onclick="agregarAlPedido({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, [{% for i in p.insumos.all %}'{{ i.nombre }}'{% if not forloop.last %}, {% endif %}{% endfor %}])">
+                onclick="agregarAlPedido({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, [{% for i in p.insumos.all %}'{{ i.nombre }}'{% if not forloop.last %}, {% endif %}{% endfor %}], '{{ p.categoria }}' )">
 
                 {% if p.imagen %}
                     <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
@@ -118,12 +142,35 @@
                 <div class="product-name">{{ p.nombre }}</div>
                 <div class="product-price">S/ {{ p.precio }}</div>
             </button>
-            {% empty %}
-            <div style="grid-column: 1/-1; text-align:center; padding:20px; color:#666;">
-                No hay productos registrados.
+
+        {% else %}
+            <div class="product-card card-agotado">
+                <div class="badge-agotado">AGOTADO</div>
+
+                {% if p.imagen %}
+                    <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" style="opacity: 0.5;">
+                {% else %}
+                    <img src="https://via.placeholder.com/150x90?text=Sin+Imagen" alt="{{ p.nombre }}" style="opacity: 0.5;">
+                {% endif %}
+
+                <div class="product-name" style="color: #999;">{{ p.nombre }}</div>
+                <div class="product-price" style="color: #999;">S/ {{ p.precio }}</div>
+
+                <div style="font-size: 0.7em; color: #dc3545; margin-top:5px;">
+                    Falta:
+                    {% for i in p.insumos.all %}
+                        {% if i.stock <= 0 %}{{ i.nombre }} {% endif %}
+                    {% endfor %}
+                </div>
             </div>
-            {% endfor %}
+        {% endif %}
+
+    {% empty %}
+        <div style="grid-column: 1/-1; text-align:center; padding:20px; color:#666;">
+            No hay productos registrados.
         </div>
+    {% endfor %}
+</div>
 
         <div class="action-bar">
             <form method="POST" action="" id="formPedido">
@@ -222,31 +269,51 @@
             const li = document.createElement('li');
             li.className = 'ticket-item';
 
-            let customizationHtml = '<ul class="ingredient-list">';
-            item.ingredientesBase.forEach(ing => {
-                const removedClass = ing.removed ? 'removed' : '';
-                customizationHtml += `
-                    <li class="ingredient-item ${removedClass}" onclick="toggleBaseIngredient('${itemId}', '${ing.nombre}', this)">
-                        <span class="ing-name">${ing.nombre}</span>
-                        <span class="ing-status">${ing.removed ? '<i class="fa-solid fa-ban" style="color:#dc3545"></i>' : '<i class="fa-solid fa-check" style="color:#28a745"></i>'}</span>
-                    </li>`;
-            });
-            item.extras.forEach(extra => {
-                customizationHtml += `
-                    <li class="ingredient-item extra">
-                        <span class="ing-name">+ ${extra.nombre}</span>
-                        <span class="ing-price">S/ ${parseFloat(extra.precio).toFixed(2)}</span>
-                    </li>`;
-            });
-            customizationHtml += '</ul>';
-            customizationHtml += `<button class="add-extra-btn" onclick="mostrarModalExtras('${itemId}')"><i class="fa-solid fa-plus-circle"></i> Extras</button>`;
+            // --- LÓGICA DE VISUALIZACIÓN SEGÚN CATEGORÍA ---
+            let customizationHtml = '';
 
+            // Solo generamos la lista de ingredientes y el botón de extras
+            // si el producto NO es 'Bebidas' ni 'Complementos'
+            if (item.categoria !== 'Bebidas' && item.categoria !== 'Complementos') {
+                customizationHtml += '<ul class="ingredient-list">';
+
+                // Ingredientes Base
+                item.ingredientesBase.forEach(ing => {
+                    const removedClass = ing.removed ? 'removed' : '';
+                    customizationHtml += `
+                        <li class="ingredient-item ${removedClass}" onclick="toggleBaseIngredient('${itemId}', '${ing.nombre}', this)">
+                            <span class="ing-name">${ing.nombre}</span>
+                            <span class="ing-status">${ing.removed ? '<i class="fa-solid fa-ban" style="color:#dc3545"></i>' : '<i class="fa-solid fa-check" style="color:#28a745"></i>'}</span>
+                        </li>`;
+                });
+
+                // Extras agregados
+                item.extras.forEach(extra => {
+                    customizationHtml += `
+                        <li class="ingredient-item extra">
+                            <span class="ing-name">+ ${extra.nombre}</span>
+                            <span class="ing-price">S/ ${parseFloat(extra.precio).toFixed(2)}</span>
+                        </li>`;
+                });
+
+                customizationHtml += '</ul>';
+
+                // Botón para añadir más extras
+                customizationHtml += `<button class="add-extra-btn" onclick="mostrarModalExtras('${itemId}')"><i class="fa-solid fa-plus-circle"></i> Extras</button>`;
+            }
+            // Si es bebida, 'customizationHtml' se queda vacío.
+
+            // --- RENDERIZADO DEL ÍTEM EN EL TICKET ---
             li.innerHTML = `
                 <div class="item-main-row">
                     <div class="item-info-name" onclick="toggleCustomization('${itemId}')">
                         <span style="font-size: 1.2em;">${item.nombre}</span>
-                        <span class="dropdown-arrow" style="font-size: 0.8em; transition: transform 0.2s;"><i class="fa-solid fa-chevron-down"></i></span>
+
+                        ${ (item.categoria !== 'Bebidas' && item.categoria !== 'Complementos')
+                           ? '<span class="dropdown-arrow" style="font-size: 0.8em; transition: transform 0.2s; margin-left:5px;"><i class="fa-solid fa-chevron-down"></i></span>'
+                           : '' }
                     </div>
+
                     <div class="ticket-item-controls">
                         <button onclick="cambiarCantidad('${itemId}', -1)"><i class="fa-solid fa-minus"></i></button>
                         <span style="margin:0 5px;">${item.cantidad}</span>
@@ -255,16 +322,17 @@
                         <button class="remove-btn" style="margin-left:10px;" onclick="eliminarItem('${itemId}')"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>
+
                 <div class="item-customization-area" id="custom-area-${itemId}">
                     ${customizationHtml}
                 </div>`;
+
             itemList.appendChild(li);
         }
         totalElement.textContent = `S/ ${total.toFixed(2)}`;
         pedidoDataInput.value = JSON.stringify(pedido);
     }
 
-    // --- Funciones Nuevas para el Pago ---
     function prepararCompra() {
         const pedidoData = document.getElementById('pedido_data_input').value;
         if (!pedidoData || pedidoData === '{}') {
@@ -284,10 +352,10 @@
     }
     // -------------------------------------
 
-    function agregarAlPedido(pId, nombre, precio, ingredientesBase) {
+    function agregarAlPedido(pId, nombre, precio, ingredientesBase, categoria) {
         const idUnico = itemIdCounter++;
         document.getElementById('empty-cart-message').style.display = 'none';
-        pedido[idUnico] = { pId: pId, nombre: nombre, precioBase: parseFloat(precio), cantidad: 1, ingredientesBase: ingredientesBase.map(ing => ({ nombre: ing, removed: false })), extras: [] };
+        pedido[idUnico] = { pId: pId, nombre: nombre, precioBase: parseFloat(precio), cantidad: 1, ingredientesBase: ingredientesBase.map(ing => ({ nombre: ing, removed: false })), extras: [], categoria: categoria };
         actualizarTicket();
     }
     function cambiarCantidad(itemId, delta) { if (!pedido[itemId]) return; const item = pedido[itemId]; item.cantidad += delta; if (item.cantidad <= 0) eliminarItem(itemId); else actualizarTicket(); }

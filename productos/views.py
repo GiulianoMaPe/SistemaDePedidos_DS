@@ -102,6 +102,7 @@ def agregar_insumo_vista(request):
         nombre = request.POST.get('nombre').strip()
         stock = request.POST.get('stock', 0)
         precio = request.POST.get('precio', 0)
+        es_extra = request.POST.get('es_extra') == 'on'
 
         if Insumo.objects.filter(nombre__iexact=nombre).exists():
             messages.error(request, f'¡El insumo "{nombre}" ya existe!')
@@ -111,13 +112,14 @@ def agregar_insumo_vista(request):
             Insumo.objects.create(
                 nombre=nombre,
                 stock=stock,
-                precio=precio
+                precio=precio,
+                es_extra=es_extra
             )
             messages.success(request, 'Insumo agregado.')
         except Exception as e:
             messages.error(request, f'Error al guardar insumo: {e}')
 
-    return redirect('admin-productos')
+        return redirect('admin-productos')
 
 
 def editar_insumo_vista(request):
@@ -126,6 +128,7 @@ def editar_insumo_vista(request):
         nuevo_nombre = request.POST.get('nombre')
         nuevo_stock = request.POST.get('stock')
         nuevo_precio = request.POST.get('precio')
+        es_extra = request.POST.get('es_extra') == 'on'
 
         insumo = get_object_or_404(Insumo, id=insumo_id)
 
@@ -137,6 +140,7 @@ def editar_insumo_vista(request):
         insumo.nombre = nuevo_nombre
         insumo.stock = nuevo_stock
         insumo.precio = nuevo_precio
+        insumo.es_extra = es_extra
         insumo.save()
         messages.success(request, 'Insumo actualizado correctamente.')
 
